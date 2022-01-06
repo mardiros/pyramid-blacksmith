@@ -1,3 +1,5 @@
+from typing import cast
+from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 import pytest
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
 from blacksmith.service._sync.client import SyncClientFactory
@@ -117,3 +119,51 @@ def test_build_sd_static_error(params):
     with pytest.raises(ConfigurationError) as ctx:
         build_sd_static(params["settings"])
     assert str(ctx.value) == params["expected"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.consul_sd_config": """
+                    addr                           http://csl.v1/
+                    service_name_fmt               {service}-{version}
+                    service_url_fmt                http://{address}:{port}/api/{version}
+                    unversioned_service_name_fmt   {service}
+                    unversioned_service_url_fmt    http://{address}:{port}/api
+                    consul_token                   abc
+                """
+            },
+            "expected": {
+                "consul_endpoint": "http://csl.v1/",
+                "service_name_fmt": "{service}-{version}",
+                "service_url_fmt": "http://{address}:{port}/api/{version}",
+                "unversioned_service_name_fmt": "{service}",
+                "unversioned_service_url_fmt": "http://{address}:{port}/api",
+                "consul_token": "abc",
+            },
+        },
+    ],
+)
+def test_build_sd_consul(params):
+    sd: SyncConsulDiscovery = build_sd_consul(params["settings"])
+    assert isinstance(sd, SyncConsulDiscovery)
+    if "consul_token" in params["expected"]:
+        assert len(sd.blacksmith_cli.middlewares) == 1
+        assert sd.blacksmith_cli.middlewares[0].headers == {
+            "Authorization": "Bearer abc"
+        }
+    else:
+        assert len(sd.blacksmith_cli.middlewares) == 0
+
+    assert sd.service_name_fmt == params["expected"]["service_name_fmt"]
+    assert sd.service_url_fmt == params["expected"]["service_url_fmt"]
+    assert (
+        sd.unversioned_service_name_fmt
+        == params["expected"]["unversioned_service_name_fmt"]
+    )
+    assert (
+        sd.unversioned_service_url_fmt
+        == params["expected"]["unversioned_service_url_fmt"]
+    )

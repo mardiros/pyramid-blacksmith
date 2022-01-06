@@ -21,6 +21,18 @@ class SDBuilder(Protocol):
         ...
 
 
+def list_to_dict(settings: Dict[str, str], setting) -> Dict:
+    list_ = aslist(settings[setting], flatten=False)
+    dict_ = {}
+    for idx, param in enumerate(list_):
+        try:
+            key, val = param.split(maxsplit=1)
+            dict_[key] = val
+        except ValueError:
+            raise ConfigurationError(f"Invalid value {param} in {setting}[{idx}]")
+    return dict_
+
+
 def build_sd_static(settings: Dict[str, str]) -> SyncStaticDiscovery:
     key = "blacksmith.static_sd_config"
     params = aslist(settings[key], flatten=False)
@@ -39,7 +51,9 @@ def build_sd_static(settings: Dict[str, str]) -> SyncStaticDiscovery:
 
 
 def build_sd_consul(settings: Dict[str, str]) -> SyncConsulDiscovery:
-    pass
+    key = "blacksmith.consul_sd_config"
+    kwargs = list_to_dict(settings, key)
+    return SyncConsulDiscovery(**kwargs)
 
 
 def build_sd_router(settings: Dict[str, str]) -> SyncRouterDiscovery:
@@ -68,7 +82,6 @@ def get_sd_strategy(settings: Dict[str, str]) -> SDBuilder:
 def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], SyncClientFactory]:
-
     def blacksmith_binding(request: Request) -> SyncClientFactory:
         sd = SyncConsulDiscovery()
         return SyncClientFactory(sd)
