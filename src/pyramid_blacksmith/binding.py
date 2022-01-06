@@ -1,16 +1,17 @@
 from typing import Callable, Dict, Protocol
+
 from blacksmith import (
     SyncClientFactory,
     SyncConsulDiscovery,
-    SyncStaticDiscovery,
     SyncRouterDiscovery,
+    SyncStaticDiscovery,
 )
+from blacksmith.sd._sync.adapters.static import Endpoints
 from blacksmith.sd._sync.base import SyncAbstractServiceDiscovery
-
 from pyramid.config import Configurator
-from pyramid.request import Request
 from pyramid.exceptions import ConfigurationError
-
+from pyramid.request import Request
+from pyramid.settings import aslist
 
 SD_KEY = "blacksmith.service_discovery"
 
@@ -21,7 +22,20 @@ class SDBuilder(Protocol):
 
 
 def build_sd_static(settings: Dict[str, str]) -> SyncStaticDiscovery:
-    pass
+    key = "blacksmith.static_sd_config"
+    params = aslist(settings[key], flatten=False)
+    services: Endpoints = {}
+    for idx, param in enumerate(params):
+        try:
+            api, url = param.split(maxsplit=1)
+        except ValueError:
+            raise ConfigurationError(f"Invalid value {param} in {key}[{idx}]")
+        try:
+            api, version = api.split("/", 1)
+        except ValueError:
+            version = None
+        services[(api, version)] = url
+    return SyncStaticDiscovery(services)
 
 
 def build_sd_consul(settings: Dict[str, str]) -> SyncConsulDiscovery:
@@ -54,8 +68,6 @@ def get_sd_strategy(settings: Dict[str, str]) -> SDBuilder:
 def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], SyncClientFactory]:
-
-    settings = config.registry.settings
 
     def blacksmith_binding(request: Request) -> SyncClientFactory:
         sd = SyncConsulDiscovery()
