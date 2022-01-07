@@ -12,6 +12,7 @@ from pyramid_blacksmith.binding import (
     build_sd_consul,
     build_sd_router,
     build_sd_static,
+    get_proxies,
     get_sd_strategy,
     list_to_dict,
 )
@@ -44,6 +45,7 @@ def test_includeme(config):
             "expected": {
                 "sd": SyncConsulDiscovery,
                 "timeout": HTTPTimeout(30, 15),
+                "proxies": None,
             },
         },
         {
@@ -52,10 +54,12 @@ def test_includeme(config):
                 "blacksmith.consul_sd_config": "",
                 "blacksmith.timeout": "5",
                 "blacksmith.connect_timeout": "2",
+                "blacksmith.proxies": ["http://  http//p/"],
             },
             "expected": {
                 "sd": SyncConsulDiscovery,
                 "timeout": HTTPTimeout(5, 2),
+                "proxies": {"http://": "http//p/"},
             },
         },
     ],
@@ -64,6 +68,7 @@ def test_req_attr(params, dummy_request):
     assert isinstance(dummy_request.blacksmith, SyncClientFactory)
     assert isinstance(dummy_request.blacksmith.sd, params["expected"]["sd"])
     assert dummy_request.blacksmith.timeout == params["expected"]["timeout"]
+    assert dummy_request.blacksmith.transport.proxies == params["expected"]["proxies"]
 
 
 @pytest.mark.parametrize(
@@ -286,3 +291,33 @@ def test_build_sd_router(params):
         sd.unversioned_service_url_fmt
         == params["expected"]["unversioned_service_url_fmt"]
     )
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.proxies": """
+                    http://   http://proxy:8080/
+                    https://  https://proxy:8443/
+                """
+            },
+            "expected": {
+                "http://": "http://proxy:8080/",
+                "https://": "https://proxy:8443/",
+            },
+        },
+        {
+            "settings": {
+                "blacksmith.proxies": """
+                """
+            },
+            "expected": None,
+        },
+        {"settings": {}, "expected": None},
+    ],
+)
+def test_get_proxies(params):
+    proxies = get_proxies(params["settings"])
+    assert proxies == params["expected"]

@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Protocol
+from typing import Callable, Dict, Optional, Protocol, cast
 
 from blacksmith import (
     SyncClientFactory,
@@ -9,6 +9,7 @@ from blacksmith import (
 from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.sd._sync.adapters.static import Endpoints
 from blacksmith.sd._sync.base import SyncAbstractServiceDiscovery
+from blacksmith.typing import Proxies
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 from pyramid.request import Request
@@ -86,6 +87,12 @@ def get_timeout(settings: Dict[str, str]) -> HTTPTimeout:
     return HTTPTimeout(**kwargs)
 
 
+def get_proxies(settings) -> Optional[Proxies]:
+    key = "blacksmith.proxies"
+    if key in settings:
+        return cast(Proxies, list_to_dict(settings, key)) or None
+
+
 def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], SyncClientFactory]:
@@ -93,7 +100,12 @@ def blacksmith_binding_factory(
     settings = config.registry.settings
     sd = get_sd_strategy(settings)(settings)
     timeout = get_timeout(settings)
-    client = SyncClientFactory(sd, timeout=timeout)
+    proxies = get_proxies(settings)
+    client = SyncClientFactory(
+        sd,
+        timeout=timeout,
+        proxies=proxies,
+    )
 
     def blacksmith_binding(request: Request) -> SyncClientFactory:
         return client
