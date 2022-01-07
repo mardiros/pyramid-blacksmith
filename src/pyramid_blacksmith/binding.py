@@ -13,7 +13,7 @@ from blacksmith.typing import Proxies
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 from pyramid.request import Request
-from pyramid.settings import aslist
+from pyramid.settings import asbool, aslist
 
 SD_KEY = "blacksmith.service_discovery"
 
@@ -93,6 +93,10 @@ def get_proxies(settings) -> Optional[Proxies]:
         return cast(Proxies, list_to_dict(settings, key)) or None
 
 
+def get_verify_certificate(settings) -> bool:
+    return asbool(settings.get("blacksmith.verify_certificate", True))
+
+
 def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], SyncClientFactory]:
@@ -101,10 +105,12 @@ def blacksmith_binding_factory(
     sd = get_sd_strategy(settings)(settings)
     timeout = get_timeout(settings)
     proxies = get_proxies(settings)
+    verify = get_verify_certificate(settings)
     client = SyncClientFactory(
         sd,
         timeout=timeout,
         proxies=proxies,
+        verify_certificate=verify,
     )
 
     def blacksmith_binding(request: Request) -> SyncClientFactory:

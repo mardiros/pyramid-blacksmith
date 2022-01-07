@@ -13,6 +13,7 @@ from pyramid_blacksmith.binding import (
     build_sd_router,
     build_sd_static,
     get_proxies,
+    get_verify_certificate,
     get_sd_strategy,
     list_to_dict,
 )
@@ -46,6 +47,7 @@ def test_includeme(config):
                 "sd": SyncConsulDiscovery,
                 "timeout": HTTPTimeout(30, 15),
                 "proxies": None,
+                "verify": True,
             },
         },
         {
@@ -55,11 +57,13 @@ def test_includeme(config):
                 "blacksmith.timeout": "5",
                 "blacksmith.connect_timeout": "2",
                 "blacksmith.proxies": ["http://  http//p/"],
+                "blacksmith.verify_certificate": False,
             },
             "expected": {
                 "sd": SyncConsulDiscovery,
                 "timeout": HTTPTimeout(5, 2),
                 "proxies": {"http://": "http//p/"},
+                "verify": False,
             },
         },
     ],
@@ -69,6 +73,10 @@ def test_req_attr(params, dummy_request):
     assert isinstance(dummy_request.blacksmith.sd, params["expected"]["sd"])
     assert dummy_request.blacksmith.timeout == params["expected"]["timeout"]
     assert dummy_request.blacksmith.transport.proxies == params["expected"]["proxies"]
+    assert (
+        dummy_request.blacksmith.transport.verify_certificate
+        == params["expected"]["verify"]
+    )
 
 
 @pytest.mark.parametrize(
@@ -321,3 +329,19 @@ def test_build_sd_router(params):
 def test_get_proxies(params):
     proxies = get_proxies(params["settings"])
     assert proxies == params["expected"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"settings": {}, "expected": True},
+        {"settings": {"blacksmith.verify_certificate": "true"}, "expected": True},
+        {"settings": {"blacksmith.verify_certificate": "1"}, "expected": True},
+        {"settings": {"blacksmith.verify_certificate": True}, "expected": True},
+        {"settings": {"blacksmith.verify_certificate": "0"}, "expected": False},
+        {"settings": {"blacksmith.verify_certificate": "whatever"}, "expected": False},
+    ],
+)
+def test_get_verify_certificate(params):
+    verify = get_verify_certificate(params["settings"])
+    assert verify is params["expected"]
