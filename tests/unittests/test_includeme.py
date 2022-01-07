@@ -1,5 +1,6 @@
 from blacksmith.middleware._sync.auth import SyncHTTPBearerAuthorization
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
+from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
 import pytest
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
 from blacksmith.service._sync.client import SyncClientFactory
@@ -160,7 +161,7 @@ def test_build_sd_static_error(params):
     ],
 )
 def test_build_sd_consul(params):
-    sd: SyncConsulDiscovery = build_sd_consul(params["settings"])
+    sd = build_sd_consul(params["settings"])
     assert isinstance(sd, SyncConsulDiscovery)
     if "consul_token" in params["expected"]:
         assert len(sd.blacksmith_cli.middlewares) == 1
@@ -180,6 +181,43 @@ def test_build_sd_consul(params):
         sd.unversioned_service_name_fmt
         == params["expected"]["unversioned_service_name_fmt"]
     )
+    assert (
+        sd.unversioned_service_url_fmt
+        == params["expected"]["unversioned_service_url_fmt"]
+    )
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.router_sd_config": """
+                    service_url_fmt             https://r/{service}-{version}
+                    unversioned_service_url_fmt https://r/{service}
+                """
+            },
+            "expected": {
+                "service_url_fmt": "https://r/{service}-{version}",
+                "unversioned_service_url_fmt": "https://r/{service}",
+            },
+        },
+        {
+            "settings": {
+                "blacksmith.router_sd_config": """
+                """
+            },
+            "expected": {
+                "service_url_fmt": "http://router/{service}-{version}/{version}",
+                "unversioned_service_url_fmt": "http://router/{service}",
+            },
+        },
+    ],
+)
+def test_build_sd_router(params):
+    sd = build_sd_router(params["settings"])
+    assert isinstance(sd, SyncRouterDiscovery)
+    assert sd.service_url_fmt == params["expected"]["service_url_fmt"]
     assert (
         sd.unversioned_service_url_fmt
         == params["expected"]["unversioned_service_url_fmt"]

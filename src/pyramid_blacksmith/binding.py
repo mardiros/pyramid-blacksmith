@@ -57,7 +57,9 @@ def build_sd_consul(settings: Dict[str, str]) -> SyncConsulDiscovery:
 
 
 def build_sd_router(settings: Dict[str, str]) -> SyncRouterDiscovery:
-    pass
+    key = "blacksmith.router_sd_config"
+    kwargs = list_to_dict(settings, key)
+    return SyncRouterDiscovery(**kwargs)
 
 
 def get_sd_strategy(settings: Dict[str, str]) -> SDBuilder:
