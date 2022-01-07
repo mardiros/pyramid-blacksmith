@@ -12,6 +12,7 @@ from pyramid_blacksmith.binding import (
     build_sd_router,
     build_sd_static,
     get_sd_strategy,
+    list_to_dict,
 )
 
 
@@ -72,16 +73,38 @@ def test_get_sd_strategy_error(params):
     [
         {
             "settings": {
-                "blacksmith.static_sd_config": [
+                "key": [
                     "api/v1 http://api.v1",
                     "smtp smtp://host/",
                 ]
             },
             "expected": {
-                ("api", "v1"): "http://api.v1",
-                ("smtp", None): "smtp://host/",
+                "api/v1": "http://api.v1",
+                "smtp": "smtp://host/",
             },
         },
+        {
+            "settings": {
+                "key": """
+                    api/v1 http://api.v1
+                    smtp   smtp://host/
+                """
+            },
+            "expected": {
+                "api/v1": "http://api.v1",
+                "smtp": "smtp://host/",
+            },
+        },
+    ],
+)
+def test_list_to_dict(params):
+    dict_ = list_to_dict(params["settings"], "key")
+    assert dict_ == params["expected"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
         {
             "settings": {
                 "blacksmith.static_sd_config": """

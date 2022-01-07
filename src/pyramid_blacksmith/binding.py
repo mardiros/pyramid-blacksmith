@@ -21,7 +21,7 @@ class SDBuilder(Protocol):
         ...
 
 
-def list_to_dict(settings: Dict[str, str], setting) -> Dict:
+def list_to_dict(settings: Dict[str, str], setting) -> Dict[str, str]:
     list_ = aslist(settings[setting], flatten=False)
     dict_ = {}
     for idx, param in enumerate(list_):
@@ -35,17 +35,10 @@ def list_to_dict(settings: Dict[str, str], setting) -> Dict:
 
 def build_sd_static(settings: Dict[str, str]) -> SyncStaticDiscovery:
     key = "blacksmith.static_sd_config"
-    params = aslist(settings[key], flatten=False)
+    services_endpoints = list_to_dict(settings, key)
     services: Endpoints = {}
-    for idx, param in enumerate(params):
-        try:
-            api, url = param.split(maxsplit=1)
-        except ValueError:
-            raise ConfigurationError(f"Invalid value {param} in {key}[{idx}]")
-        try:
-            api, version = api.split("/", 1)
-        except ValueError:
-            version = None
+    for api, url in services_endpoints.items():
+        api, version = api.split("/", 1) if "/" in api else (api, None)
         services[(api, version)] = url
     return SyncStaticDiscovery(services)
 
