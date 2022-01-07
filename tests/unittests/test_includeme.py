@@ -1,10 +1,15 @@
+import sys
+from pathlib import Path
+
+import pytest
 from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.middleware._sync.auth import SyncHTTPBearerAuthorization
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
-import pytest
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
+from blacksmith.service._sync.adapters.httpx import SyncHttpxTransport
 from blacksmith.service._sync.client import SyncClientFactory
+from pydantic.typing import NoneType
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import IRequestExtensions
 
@@ -12,11 +17,16 @@ from pyramid_blacksmith.binding import (
     build_sd_consul,
     build_sd_router,
     build_sd_static,
+    build_transport,
     get_proxies,
-    get_verify_certificate,
     get_sd_strategy,
+    get_verify_certificate,
     list_to_dict,
 )
+
+here = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(here))
+from tests.unittests.transport import DummyTransport  # noqa
 
 
 @pytest.mark.parametrize(
@@ -48,6 +58,7 @@ def test_includeme(config):
                 "timeout": HTTPTimeout(30, 15),
                 "proxies": None,
                 "verify": True,
+                "transport": SyncHttpxTransport,
             },
         },
         {
@@ -64,6 +75,21 @@ def test_includeme(config):
                 "timeout": HTTPTimeout(5, 2),
                 "proxies": {"http://": "http//p/"},
                 "verify": False,
+                "transport": SyncHttpxTransport,
+            },
+        },
+        {
+            "settings": {
+                "blacksmith.service_discovery": "consul",
+                "blacksmith.consul_sd_config": "",
+                "blacksmith.transport": DummyTransport(),
+            },
+            "expected": {
+                "sd": SyncConsulDiscovery,
+                "timeout": HTTPTimeout(30, 15),
+                "proxies": None,
+                "verify": True,
+                "transport": DummyTransport,
             },
         },
     ],
@@ -76,6 +102,9 @@ def test_req_attr(params, dummy_request):
     assert (
         dummy_request.blacksmith.transport.verify_certificate
         == params["expected"]["verify"]
+    )
+    assert isinstance(
+        dummy_request.blacksmith.transport, params["expected"]["transport"]
     )
 
 
@@ -345,3 +374,25 @@ def test_get_proxies(params):
 def test_get_verify_certificate(params):
     verify = get_verify_certificate(params["settings"])
     assert verify is params["expected"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"settings": {}, "expected": NoneType},
+        {"settings": {"blacksmith.transport": ""}, "expected": NoneType},
+        {
+            "settings": {"blacksmith.transport": DummyTransport()},
+            "expected": DummyTransport,
+        },
+        {
+            "settings": {
+                "blacksmith.transport": "tests.unittests.transport:DummyTransport"
+            },
+            "expected": DummyTransport,
+        },
+    ],
+)
+def test_build_transport(params):
+    transport = build_transport(params["settings"])
+    assert isinstance(transport, params["expected"])

@@ -1,5 +1,6 @@
 from typing import Callable, Dict, Optional, Protocol, cast
 
+import pkg_resources
 from blacksmith import (
     SyncClientFactory,
     SyncConsulDiscovery,
@@ -9,6 +10,7 @@ from blacksmith import (
 from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.sd._sync.adapters.static import Endpoints
 from blacksmith.sd._sync.base import SyncAbstractServiceDiscovery
+from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.typing import Proxies
 from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
@@ -17,13 +19,15 @@ from pyramid.settings import asbool, aslist
 
 SD_KEY = "blacksmith.service_discovery"
 
+Settings = Dict[str, str]
+
 
 class SDBuilder(Protocol):
-    def __call__(self, settings: Dict[str, str]) -> SyncAbstractServiceDiscovery:
+    def __call__(self, settings: Settings) -> SyncAbstractServiceDiscovery:
         ...
 
 
-def list_to_dict(settings: Dict[str, str], setting) -> Dict[str, str]:
+def list_to_dict(settings: Settings, setting: str) -> Settings:
     list_ = aslist(settings[setting], flatten=False)
     dict_ = {}
     for idx, param in enumerate(list_):
@@ -35,7 +39,7 @@ def list_to_dict(settings: Dict[str, str], setting) -> Dict[str, str]:
     return dict_
 
 
-def build_sd_static(settings: Dict[str, str]) -> SyncStaticDiscovery:
+def build_sd_static(settings: Settings) -> SyncStaticDiscovery:
     key = "blacksmith.static_sd_config"
     services_endpoints = list_to_dict(settings, key)
     services: Endpoints = {}
@@ -45,19 +49,19 @@ def build_sd_static(settings: Dict[str, str]) -> SyncStaticDiscovery:
     return SyncStaticDiscovery(services)
 
 
-def build_sd_consul(settings: Dict[str, str]) -> SyncConsulDiscovery:
+def build_sd_consul(settings: Settings) -> SyncConsulDiscovery:
     key = "blacksmith.consul_sd_config"
     kwargs = list_to_dict(settings, key)
     return SyncConsulDiscovery(**kwargs)
 
 
-def build_sd_router(settings: Dict[str, str]) -> SyncRouterDiscovery:
+def build_sd_router(settings: Settings) -> SyncRouterDiscovery:
     key = "blacksmith.router_sd_config"
     kwargs = list_to_dict(settings, key)
     return SyncRouterDiscovery(**kwargs)
 
 
-def get_sd_strategy(settings: Dict[str, str]) -> SDBuilder:
+def get_sd_strategy(settings: Settings) -> SDBuilder:
     sd_classes: Dict[str, SDBuilder] = {
         "static": build_sd_static,
         "consul": build_sd_consul,
@@ -76,7 +80,7 @@ def get_sd_strategy(settings: Dict[str, str]) -> SDBuilder:
     return sd_classes[sd_name]
 
 
-def get_timeout(settings: Dict[str, str]) -> HTTPTimeout:
+def get_timeout(settings: Settings) -> HTTPTimeout:
     kwargs = {}
     for key in (
         ("blacksmith.timeout", "timeout"),
@@ -93,8 +97,19 @@ def get_proxies(settings) -> Optional[Proxies]:
         return cast(Proxies, list_to_dict(settings, key)) or None
 
 
-def get_verify_certificate(settings) -> bool:
+def get_verify_certificate(settings: Settings) -> bool:
     return asbool(settings.get("blacksmith.verify_certificate", True))
+
+
+def build_transport(settings: Settings) -> Optional[SyncAbstractTransport]:
+    value = settings.get("blacksmith.transport")
+    if not value:
+        return None
+    if isinstance(value, SyncAbstractTransport):
+        return value
+    ep = pkg_resources.EntryPoint.parse(f"x={value}")
+    cls = ep.resolve()
+    return cls()
 
 
 def blacksmith_binding_factory(
@@ -106,11 +121,13 @@ def blacksmith_binding_factory(
     timeout = get_timeout(settings)
     proxies = get_proxies(settings)
     verify = get_verify_certificate(settings)
+    transport = build_transport(settings)
     client = SyncClientFactory(
         sd,
         timeout=timeout,
         proxies=proxies,
         verify_certificate=verify,
+        transport=transport,
     )
 
     def blacksmith_binding(request: Request) -> SyncClientFactory:
