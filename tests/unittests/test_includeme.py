@@ -1,4 +1,4 @@
-from typing import cast
+from blacksmith.middleware._sync.auth import SyncHTTPBearerAuthorization
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 import pytest
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
@@ -96,7 +96,7 @@ def test_get_sd_strategy_error(params):
     ],
 )
 def test_build_sd_static(params):
-    sd: SyncStaticDiscovery = build_sd_static(params["settings"])
+    sd = build_sd_static(params["settings"])
     assert isinstance(sd, SyncStaticDiscovery)
     assert sd.endpoints == params["expected"]
 
@@ -127,8 +127,8 @@ def test_build_sd_static_error(params):
         {
             "settings": {
                 "blacksmith.consul_sd_config": """
-                    addr                           http://csl.v1/
-                    service_name_fmt               {service}-{version}
+                    addr                           https://csl.v1/
+                    service_name_fmt               {service}${version}
                     service_url_fmt                http://{address}:{port}/api/{version}
                     unversioned_service_name_fmt   {service}
                     unversioned_service_url_fmt    http://{address}:{port}/api
@@ -136,12 +136,25 @@ def test_build_sd_static_error(params):
                 """
             },
             "expected": {
-                "consul_endpoint": "http://csl.v1/",
-                "service_name_fmt": "{service}-{version}",
+                "consul_endpoint": "https://csl.v1/",
+                "service_name_fmt": "{service}${version}",
                 "service_url_fmt": "http://{address}:{port}/api/{version}",
                 "unversioned_service_name_fmt": "{service}",
                 "unversioned_service_url_fmt": "http://{address}:{port}/api",
                 "consul_token": "abc",
+            },
+        },
+        {
+            "settings": {
+                "blacksmith.consul_sd_config": """
+                """
+            },
+            "expected": {
+                "consul_endpoint": "http://consul.v1/",
+                "service_name_fmt": "{service}-{version}",
+                "service_url_fmt": "http://{address}:{port}/{version}",
+                "unversioned_service_name_fmt": "{service}",
+                "unversioned_service_url_fmt": "http://{address}:{port}",
             },
         },
     ],
@@ -151,6 +164,10 @@ def test_build_sd_consul(params):
     assert isinstance(sd, SyncConsulDiscovery)
     if "consul_token" in params["expected"]:
         assert len(sd.blacksmith_cli.middlewares) == 1
+        assert isinstance(
+            sd.blacksmith_cli.middlewares[0],
+            SyncHTTPBearerAuthorization,
+        )
         assert sd.blacksmith_cli.middlewares[0].headers == {
             "Authorization": "Bearer abc"
         }
