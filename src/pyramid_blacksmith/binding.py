@@ -6,6 +6,7 @@ from blacksmith import (
     SyncRouterDiscovery,
     SyncStaticDiscovery,
 )
+from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.sd._sync.adapters.static import Endpoints
 from blacksmith.sd._sync.base import SyncAbstractServiceDiscovery
 from pyramid.config import Configurator
@@ -74,13 +75,28 @@ def get_sd_strategy(settings: Dict[str, str]) -> SDBuilder:
     return sd_classes[sd_name]
 
 
+def get_timeout(settings: Dict[str, str]) -> HTTPTimeout:
+    kwargs = {}
+    for key in (
+        ("blacksmith.timeout", "timeout"),
+        ("blacksmith.connect_timeout", "connect"),
+    ):
+        if key[0] in settings:
+            kwargs[key[1]] = int(settings[key[0]])
+    return HTTPTimeout(**kwargs)
+
+
 def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], SyncClientFactory]:
+
+    settings = config.registry.settings
+    sd = get_sd_strategy(settings)(settings)
+    timeout = get_timeout(settings)
+    client = SyncClientFactory(sd, timeout=timeout)
+
     def blacksmith_binding(request: Request) -> SyncClientFactory:
-        settings = config.registry.settings
-        sd = get_sd_strategy(settings)(settings)
-        return SyncClientFactory(sd)
+        return client
 
     return blacksmith_binding
 

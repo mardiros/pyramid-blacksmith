@@ -1,3 +1,4 @@
+from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.middleware._sync.auth import SyncHTTPBearerAuthorization
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
@@ -16,7 +17,17 @@ from pyramid_blacksmith.binding import (
 )
 
 
-@pytest.mark.parametrize("params", [{}])
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.service_discovery": "consul",
+                "blacksmith.consul_sd_config": "",
+            },
+        }
+    ],
+)
 def test_includeme(config):
     ext = config.registry.queryUtility(IRequestExtensions)
     assert "blacksmith" in ext.descriptors
@@ -32,6 +43,19 @@ def test_includeme(config):
             },
             "expected": {
                 "sd": SyncConsulDiscovery,
+                "timeout": HTTPTimeout(30, 15),
+            },
+        },
+        {
+            "settings": {
+                "blacksmith.service_discovery": "consul",
+                "blacksmith.consul_sd_config": "",
+                "blacksmith.timeout": "5",
+                "blacksmith.connect_timeout": "2",
+            },
+            "expected": {
+                "sd": SyncConsulDiscovery,
+                "timeout": HTTPTimeout(5, 2),
             },
         },
     ],
@@ -39,6 +63,7 @@ def test_includeme(config):
 def test_req_attr(params, dummy_request):
     assert isinstance(dummy_request.blacksmith, SyncClientFactory)
     assert isinstance(dummy_request.blacksmith.sd, params["expected"]["sd"])
+    assert dummy_request.blacksmith.timeout == params["expected"]["timeout"]
 
 
 @pytest.mark.parametrize(
