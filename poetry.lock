@@ -67,7 +67,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "blacksmith"
-version = "0.8.0"
+version = "0.9.0"
 description = "REST API Client designed for microservices"
 category = "main"
 optional = false
@@ -177,7 +177,7 @@ http2 = ["h2 (>=3,<5)"]
 
 [[package]]
 name = "httpx"
-version = "0.21.2"
+version = "0.21.3"
 description = "The next generation HTTP client."
 category = "main"
 optional = false
@@ -604,7 +604,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "0bda86f4b54cf403c5bec9391ab6e8122725f7fdf3d1e96c6612c0b14bf2ba55"
+content-hash = "ad544947f4650b88acb194756f2b0d0ff90652ebec4767acb67a5df943e407e5"
 
 [metadata.files]
 anyio = [
@@ -624,8 +624,8 @@ black = [
     {file = "black-21.12b0.tar.gz", hash = "sha256:77b80f693a569e2e527958459634f18df9b0ba2625ba4e0c2d5da5be42e6f2b3"},
 ]
 blacksmith = [
-    {file = "blacksmith-0.8.0-py3-none-any.whl", hash = "sha256:068717b2346775a8cdccd90c4a57e3e2fa3d4beef26b27d1e4ef651fb007dde2"},
-    {file = "blacksmith-0.8.0.tar.gz", hash = "sha256:c5e2279da2fdbf12379325b1bb3612af83cafc3d67fedc02fa7e88f6e2cf5eb4"},
+    {file = "blacksmith-0.9.0-py3-none-any.whl", hash = "sha256:6153dd3e18dc2973634a8d3592d4d48e7ad33ca83c6b947d1b1085da23078fb7"},
+    {file = "blacksmith-0.9.0.tar.gz", hash = "sha256:3a6e239ccbc38c75a6a57932ab9bd6d14d44972a142e722f5538c7089de95642"},
 ]
 certifi = [
     {file = "certifi-2021.10.8-py2.py3-none-any.whl", hash = "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569"},
@@ -705,8 +705,8 @@ httpcore = [
     {file = "httpcore-0.14.4.tar.gz", hash = "sha256:d4305811f604d3c2e22869147392f134796976ff946c96a8cfba87f4e0171d83"},
 ]
 httpx = [
-    {file = "httpx-0.21.2-py3-none-any.whl", hash = "sha256:6d88b1208f0996ee99c7a1e38fcfbdc66891c8fc583673337152681ac23585f6"},
-    {file = "httpx-0.21.2.tar.gz", hash = "sha256:c7c71345faa8983a094bbd24b5b5cc6f4bd274aadcb072a25b312cb209167aef"},
+    {file = "httpx-0.21.3-py3-none-any.whl", hash = "sha256:df9a0fd43fa79dbab411d83eb1ea6f7a525c96ad92e60c2d7f40388971b25777"},
+    {file = "httpx-0.21.3.tar.gz", hash = "sha256:7a3eb67ef0b8abbd6d9402248ef2f84a76080fa1c839f8662e6eb385640e445a"},
 ]
 hupper = [
     {file = "hupper-1.10.3-py2.py3-none-any.whl", hash = "sha256:f683850d62598c02faf3c7cdaaa727d8cbe3c5a2497a5737a8358386903b2601"},
