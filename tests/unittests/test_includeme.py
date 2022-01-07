@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from blacksmith.domain.model.params import CollectionParser
 
 import pytest
 from blacksmith.domain.model.http import HTTPTimeout
@@ -14,6 +15,7 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import IRequestExtensions
 
 from pyramid_blacksmith.binding import (
+    build_collection_parser,
     build_sd_consul,
     build_sd_router,
     build_sd_static,
@@ -26,7 +28,7 @@ from pyramid_blacksmith.binding import (
 
 here = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(here))
-from tests.unittests.transport import DummyTransport  # noqa
+from tests.unittests.fixtures import DummyCollectionParser, DummyTransport  # noqa
 
 
 @pytest.mark.parametrize(
@@ -59,6 +61,7 @@ def test_includeme(config):
                 "proxies": None,
                 "verify": True,
                 "transport": SyncHttpxTransport,
+                "collection_parser": CollectionParser,
             },
         },
         {
@@ -69,6 +72,7 @@ def test_includeme(config):
                 "blacksmith.connect_timeout": "2",
                 "blacksmith.proxies": ["http://  http//p/"],
                 "blacksmith.verify_certificate": False,
+                "blacksmith.collection_parser": DummyCollectionParser,
             },
             "expected": {
                 "sd": SyncConsulDiscovery,
@@ -76,6 +80,7 @@ def test_includeme(config):
                 "proxies": {"http://": "http//p/"},
                 "verify": False,
                 "transport": SyncHttpxTransport,
+                "collection_parser": DummyCollectionParser,
             },
         },
         {
@@ -90,6 +95,7 @@ def test_includeme(config):
                 "proxies": None,
                 "verify": True,
                 "transport": DummyTransport,
+                "collection_parser": CollectionParser,
             },
         },
     ],
@@ -105,6 +111,10 @@ def test_req_attr(params, dummy_request):
     )
     assert isinstance(
         dummy_request.blacksmith.transport, params["expected"]["transport"]
+    )
+    assert (
+        dummy_request.blacksmith.collection_parser
+        is params["expected"]["collection_parser"]
     )
 
 
@@ -387,7 +397,7 @@ def test_get_verify_certificate(params):
         },
         {
             "settings": {
-                "blacksmith.transport": "tests.unittests.transport:DummyTransport"
+                "blacksmith.transport": "tests.unittests.fixtures:DummyTransport"
             },
             "expected": DummyTransport,
         },
@@ -396,3 +406,28 @@ def test_get_verify_certificate(params):
 def test_build_transport(params):
     transport = build_transport(params["settings"])
     assert isinstance(transport, params["expected"])
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"settings": {}, "expected": CollectionParser},
+        {
+            "settings": {"blacksmith.collection_parser": ""},
+            "expected": CollectionParser,
+        },
+        {
+            "settings": {"blacksmith.collection_parser": DummyCollectionParser},
+            "expected": DummyCollectionParser,
+        },
+        {
+            "settings": {
+                "blacksmith.collection_parser": "tests.unittests.fixtures:DummyCollectionParser"
+            },
+            "expected": DummyCollectionParser,
+        },
+    ],
+)
+def test_build_collection_parser(params):
+    parser = build_collection_parser(params["settings"])
+    assert parser == params["expected"]

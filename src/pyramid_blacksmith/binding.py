@@ -1,4 +1,5 @@
-from typing import Callable, Dict, Optional, Protocol, cast
+from typing import Callable, Dict, Optional, Protocol, Type, cast
+from blacksmith.domain.model.params import CollectionParser
 
 import pkg_resources
 from blacksmith import (
@@ -112,6 +113,17 @@ def build_transport(settings: Settings) -> Optional[SyncAbstractTransport]:
     return cls()
 
 
+def build_collection_parser(settings: Settings) -> Type[CollectionParser]:
+    value = settings.get("blacksmith.collection_parser")
+    if not value:
+        return CollectionParser
+    if isinstance(value, type) and issubclass(value, CollectionParser):
+        return value
+    ep = pkg_resources.EntryPoint.parse(f"x={value}")
+    cls = ep.resolve()
+    return cls
+
+
 def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], SyncClientFactory]:
@@ -122,12 +134,14 @@ def blacksmith_binding_factory(
     proxies = get_proxies(settings)
     verify = get_verify_certificate(settings)
     transport = build_transport(settings)
+    collection_parser = build_collection_parser(settings)
     client = SyncClientFactory(
         sd,
         timeout=timeout,
         proxies=proxies,
         verify_certificate=verify,
         transport=transport,
+        collection_parser=collection_parser,
     )
 
     def blacksmith_binding(request: Request) -> SyncClientFactory:
