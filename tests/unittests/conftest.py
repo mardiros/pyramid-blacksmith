@@ -9,17 +9,16 @@ from pyramid_blacksmith import includeme
 
 
 @pytest.fixture
-def config():
-    config = testing.setUp()
+def config(params):
+    config = testing.setUp(settings=params.get("settings", {}))
     config.include(includeme)
     yield config
     testing.tearDown()
 
 
 @pytest.fixture
-def dummy_request(config: Configurator, params=None):
-    params = params or {}
-    req = DummyRequest(config=config, **params.get("request", {}))
+def dummy_request(config: Configurator):
+    req = DummyRequest(config=config)
     exts = config.registry.queryUtility(IRequestExtensions)
     apply_request_extensions(req, exts)
     yield req

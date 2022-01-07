@@ -16,13 +16,29 @@ from pyramid_blacksmith.binding import (
 )
 
 
+@pytest.mark.parametrize("params", [{}])
 def test_includeme(config):
     ext = config.registry.queryUtility(IRequestExtensions)
     assert "blacksmith" in ext.descriptors
 
 
-def test_req_attr(dummy_request):
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.service_discovery": "consul",
+                "blacksmith.consul_sd_config": "",
+            },
+            "expected": {
+                "sd": SyncConsulDiscovery,
+            },
+        },
+    ],
+)
+def test_req_attr(params, dummy_request):
     assert isinstance(dummy_request.blacksmith, SyncClientFactory)
+    assert isinstance(dummy_request.blacksmith.sd, params["expected"]["sd"])
 
 
 @pytest.mark.parametrize(

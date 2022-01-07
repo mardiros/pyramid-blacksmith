@@ -78,7 +78,8 @@ def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], SyncClientFactory]:
     def blacksmith_binding(request: Request) -> SyncClientFactory:
-        sd = SyncConsulDiscovery()
+        settings = config.registry.settings
+        sd = get_sd_strategy(settings)(settings)
         return SyncClientFactory(sd)
 
     return blacksmith_binding
