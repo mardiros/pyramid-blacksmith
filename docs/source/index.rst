@@ -12,6 +12,7 @@
 
    user/introduction
    user/api
+   user/changelog
 
 .. toctree::
    :maxdepth: 1
