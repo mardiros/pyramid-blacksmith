@@ -155,6 +155,36 @@ def test_req_attr(params, dummy_request):
     [
         {
             "settings": {
+                "blacksmith.clients": """
+                    client1
+                    client2
+                """,
+                "blacksmith.client1.service_discovery": "consul",
+                "blacksmith.client1.consul_sd_config": "",
+                "blacksmith.client2.service_discovery": "static",
+                "blacksmith.client2.static_sd_config": [],
+            },
+            "expected": {
+                "client1": SyncConsulDiscovery,
+                "client2": SyncStaticDiscovery,
+            },
+        }
+    ],
+)
+def test_multi_client(params, dummy_request):
+    assert isinstance(
+        dummy_request.blacksmith.client1.sd, params["expected"]["client1"]
+    )
+    assert isinstance(
+        dummy_request.blacksmith.client2.sd, params["expected"]["client2"]
+    )
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
                 "blacksmith.client.service_discovery": "static",
                 "blacksmith.client.static_sd_config": [],
             },
