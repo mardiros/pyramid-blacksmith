@@ -16,7 +16,7 @@ from pyramid.interfaces import IRequestExtensions
 
 from pyramid_blacksmith.binding import (
     BlacksmithClientSettingsBuilder,
-    Clients,
+    PyramidBlacksmith,
     list_to_dict,
 )
 
@@ -129,7 +129,7 @@ def test_list_to_dict(params):
     ],
 )
 def test_req_attr(params, dummy_request):
-    assert isinstance(dummy_request.blacksmith, Clients)
+    assert isinstance(dummy_request.blacksmith, PyramidBlacksmith)
     assert isinstance(dummy_request.blacksmith.client, SyncClientFactory)
     assert isinstance(dummy_request.blacksmith.client.sd, params["expected"]["sd"])
     assert dummy_request.blacksmith.client.timeout == params["expected"]["timeout"]

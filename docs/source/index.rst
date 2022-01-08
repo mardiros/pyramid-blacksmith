@@ -3,14 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to pyramid-blacksmith's documentation!
-==============================================
+.. include:: ../../README.rst
+
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+   :maxdepth: 1
+   :caption: Users Documentation:
 
+   user/introduction
+   user/api
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Developers Documentation:
+
+   develop/api
 
 Indices and tables
 ==================

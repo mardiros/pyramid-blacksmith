@@ -132,11 +132,34 @@ class BlacksmithClientSettingsBuilder:
         return cls
 
 
-class Clients:
+class PyramidBlacksmith:
+    """
+    Type of the `request.blacksmith` property.
+    
+    This can be used to create a ``Protocol`` of the pyramid ``Request``
+    in final application for typing purpose.
+
+    Example:
+
+    .. code-block::
+
+        from pyramid_blacksmith import PyramidBlacksmith
+
+        class RequestProtocol(Protocol):
+            blacksmith: PyramidBlacksmith
+
+
+        def my_view(request: RequestProtocol):
+            ...
+
+    """
     def __init__(self, clients: Dict[str, SyncClientFactory]):
         self.clients = clients
 
     def __getattr__(self, name: str) -> SyncClientFactory:
+        """
+        Return the blacksmith client factory named in the configuration.
+        """
         try:
             return self.clients[name]
         except KeyError as k:
@@ -145,7 +168,7 @@ class Clients:
 
 def blacksmith_binding_factory(
     config: Configurator,
-) -> Callable[[Request], Clients]:
+) -> Callable[[Request], PyramidBlacksmith]:
 
     settings = config.registry.settings
     clients_key = aslist(settings.get("blacksmith.clients", ["client"]))
@@ -153,15 +176,34 @@ def blacksmith_binding_factory(
         key: BlacksmithClientSettingsBuilder(settings, key).build()
         for key in clients_key
     }
-    clients = Clients(clients_dict)
+    clients = PyramidBlacksmith(clients_dict)
 
-    def blacksmith_binding(request: Request) -> Clients:
+    def blacksmith_binding(request: Request) -> PyramidBlacksmith:
         return clients
 
     return blacksmith_binding
 
 
 def includeme(config: Configurator):
+    """
+    Expose the method consume by the Configurator while using:
+
+    ::
+
+        config.include('pyramid_blacksmith')
+
+
+    This will inject the request property ``request.blacksmith`` like 
+    the pyramid view below:
+
+    ::
+
+        def my_view(request):
+
+            api = request.blacksmith.client("api")
+            ...
+
+    """
     config.add_request_method(
         callable=blacksmith_binding_factory(config),
         name="blacksmith",
