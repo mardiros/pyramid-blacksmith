@@ -22,6 +22,9 @@ black:
     poetry run isort .
     poetry run black .
 
+rtd:
+    poetry export --dev -f requirements.txt -o docs/requirements.txt
+
 cov test_suite=default_test_suite:
     rm -f .coverage
     rm -rf htmlcov
