@@ -49,3 +49,4 @@ jobs:
         with:
           # Comma-separated list of files to upload
           files: coverage.xml
+          name: pyramid-blacksmith
