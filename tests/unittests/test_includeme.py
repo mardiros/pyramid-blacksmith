@@ -15,14 +15,8 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import IRequestExtensions
 
 from pyramid_blacksmith.binding import (
-    build_collection_parser,
-    build_sd_consul,
-    build_sd_router,
-    build_sd_static,
-    build_transport,
-    get_proxies,
-    get_sd_strategy,
-    get_verify_certificate,
+    BlacksmithClientSettingsBuilder,
+    Clients,
     list_to_dict,
 )
 
@@ -36,8 +30,8 @@ from tests.unittests.fixtures import DummyCollectionParser, DummyTransport  # no
     [
         {
             "settings": {
-                "blacksmith.service_discovery": "consul",
-                "blacksmith.consul_sd_config": "",
+                "blacksmith.client.service_discovery": "consul",
+                "blacksmith.client.consul_sd_config": "",
             },
         }
     ],
@@ -45,120 +39,6 @@ from tests.unittests.fixtures import DummyCollectionParser, DummyTransport  # no
 def test_includeme(config):
     ext = config.registry.queryUtility(IRequestExtensions)
     assert "blacksmith" in ext.descriptors
-
-
-@pytest.mark.parametrize(
-    "params",
-    [
-        {
-            "settings": {
-                "blacksmith.service_discovery": "consul",
-                "blacksmith.consul_sd_config": "",
-            },
-            "expected": {
-                "sd": SyncConsulDiscovery,
-                "timeout": HTTPTimeout(30, 15),
-                "proxies": None,
-                "verify": True,
-                "transport": SyncHttpxTransport,
-                "collection_parser": CollectionParser,
-            },
-        },
-        {
-            "settings": {
-                "blacksmith.service_discovery": "consul",
-                "blacksmith.consul_sd_config": "",
-                "blacksmith.timeout": "5",
-                "blacksmith.connect_timeout": "2",
-                "blacksmith.proxies": ["http://  http//p/"],
-                "blacksmith.verify_certificate": False,
-                "blacksmith.collection_parser": DummyCollectionParser,
-            },
-            "expected": {
-                "sd": SyncConsulDiscovery,
-                "timeout": HTTPTimeout(5, 2),
-                "proxies": {"http://": "http//p/"},
-                "verify": False,
-                "transport": SyncHttpxTransport,
-                "collection_parser": DummyCollectionParser,
-            },
-        },
-        {
-            "settings": {
-                "blacksmith.service_discovery": "consul",
-                "blacksmith.consul_sd_config": "",
-                "blacksmith.transport": DummyTransport(),
-            },
-            "expected": {
-                "sd": SyncConsulDiscovery,
-                "timeout": HTTPTimeout(30, 15),
-                "proxies": None,
-                "verify": True,
-                "transport": DummyTransport,
-                "collection_parser": CollectionParser,
-            },
-        },
-    ],
-)
-def test_req_attr(params, dummy_request):
-    assert isinstance(dummy_request.blacksmith, SyncClientFactory)
-    assert isinstance(dummy_request.blacksmith.sd, params["expected"]["sd"])
-    assert dummy_request.blacksmith.timeout == params["expected"]["timeout"]
-    assert dummy_request.blacksmith.transport.proxies == params["expected"]["proxies"]
-    assert (
-        dummy_request.blacksmith.transport.verify_certificate
-        == params["expected"]["verify"]
-    )
-    assert isinstance(
-        dummy_request.blacksmith.transport, params["expected"]["transport"]
-    )
-    assert (
-        dummy_request.blacksmith.collection_parser
-        is params["expected"]["collection_parser"]
-    )
-
-
-@pytest.mark.parametrize(
-    "params",
-    [
-        {
-            "settings": {"blacksmith.service_discovery": "static"},
-            "expected": build_sd_static,
-        },
-        {
-            "settings": {"blacksmith.service_discovery": "consul"},
-            "expected": build_sd_consul,
-        },
-        {
-            "settings": {"blacksmith.service_discovery": "router"},
-            "expected": build_sd_router,
-        },
-    ],
-)
-def test_get_sd_strategy(params):
-    assert get_sd_strategy(params["settings"]) == params["expected"]
-
-
-@pytest.mark.parametrize(
-    "params",
-    [
-        {
-            "settings": {},
-            "expected": "Missing setting blacksmith.service_discovery",
-        },
-        {
-            "settings": {"blacksmith.service_discovery": "Static"},
-            "expected": (
-                "Invalid value Static for blacksmith.service_discovery: "
-                "not in static, consul, router"
-            ),
-        },
-    ],
-)
-def test_get_sd_strategy_error(params):
-    with pytest.raises(ConfigurationError) as ctx:
-        get_sd_strategy(params["settings"])
-    assert str(ctx.value) == params["expected"]
 
 
 @pytest.mark.parametrize(
@@ -200,7 +80,166 @@ def test_list_to_dict(params):
     [
         {
             "settings": {
-                "blacksmith.static_sd_config": """
+                "blacksmith.client.service_discovery": "consul",
+                "blacksmith.client.consul_sd_config": "",
+            },
+            "expected": {
+                "sd": SyncConsulDiscovery,
+                "timeout": HTTPTimeout(30, 15),
+                "proxies": None,
+                "verify": True,
+                "transport": SyncHttpxTransport,
+                "collection_parser": CollectionParser,
+            },
+        },
+        {
+            "settings": {
+                "blacksmith.client.service_discovery": "consul",
+                "blacksmith.client.consul_sd_config": "",
+                "blacksmith.client.timeout": "5",
+                "blacksmith.client.connect_timeout": "2",
+                "blacksmith.client.proxies": ["http://  http//p/"],
+                "blacksmith.client.verify_certificate": False,
+                "blacksmith.client.collection_parser": DummyCollectionParser,
+            },
+            "expected": {
+                "sd": SyncConsulDiscovery,
+                "timeout": HTTPTimeout(5, 2),
+                "proxies": {"http://": "http//p/"},
+                "verify": False,
+                "transport": SyncHttpxTransport,
+                "collection_parser": DummyCollectionParser,
+            },
+        },
+        {
+            "settings": {
+                "blacksmith.client.service_discovery": "consul",
+                "blacksmith.client.consul_sd_config": "",
+                "blacksmith.client.transport": DummyTransport(),
+            },
+            "expected": {
+                "sd": SyncConsulDiscovery,
+                "timeout": HTTPTimeout(30, 15),
+                "proxies": None,
+                "verify": True,
+                "transport": DummyTransport,
+                "collection_parser": CollectionParser,
+            },
+        },
+    ],
+)
+def test_req_attr(params, dummy_request):
+    assert isinstance(dummy_request.blacksmith, Clients)
+    assert isinstance(dummy_request.blacksmith.client, SyncClientFactory)
+    assert isinstance(dummy_request.blacksmith.client.sd, params["expected"]["sd"])
+    assert dummy_request.blacksmith.client.timeout == params["expected"]["timeout"]
+    assert (
+        dummy_request.blacksmith.client.transport.proxies
+        == params["expected"]["proxies"]
+    )
+    assert (
+        dummy_request.blacksmith.client.transport.verify_certificate
+        == params["expected"]["verify"]
+    )
+    assert isinstance(
+        dummy_request.blacksmith.client.transport, params["expected"]["transport"]
+    )
+    assert (
+        dummy_request.blacksmith.client.collection_parser
+        is params["expected"]["collection_parser"]
+    )
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.clients": """
+                    client1
+                    client2
+                """,
+                "blacksmith.client1.service_discovery": "consul",
+                "blacksmith.client1.consul_sd_config": "",
+                "blacksmith.client2.service_discovery": "static",
+                "blacksmith.client2.static_sd_config": [],
+            },
+            "expected": {
+                "client1": SyncConsulDiscovery,
+                "client2": SyncStaticDiscovery,
+            },
+        }
+    ],
+)
+def test_multi_client(params, dummy_request):
+    assert isinstance(
+        dummy_request.blacksmith.client1.sd, params["expected"]["client1"]
+    )
+    assert isinstance(
+        dummy_request.blacksmith.client2.sd, params["expected"]["client2"]
+    )
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.client.service_discovery": "static",
+                "blacksmith.client.static_sd_config": [],
+            },
+            "expected": SyncStaticDiscovery,
+        },
+        {
+            "settings": {
+                "blacksmith.client.service_discovery": "consul",
+                "blacksmith.client.consul_sd_config": [],
+            },
+            "expected": SyncConsulDiscovery,
+        },
+        {
+            "settings": {
+                "blacksmith.client.service_discovery": "router",
+                "blacksmith.client.router_sd_config": [],
+            },
+            "expected": SyncRouterDiscovery,
+        },
+    ],
+)
+def test_get_sd_strategy(params):
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+    assert isinstance(builder.build_sd_strategy(), params["expected"])
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {},
+            "expected": "Missing setting blacksmith.client.service_discovery",
+        },
+        {
+            "settings": {"blacksmith.client.service_discovery": "Static"},
+            "expected": (
+                "Invalid value Static for blacksmith.client.service_discovery: "
+                "not in static, consul, router"
+            ),
+        },
+    ],
+)
+def test_get_sd_strategy_error(params):
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+    with pytest.raises(ConfigurationError) as ctx:
+        builder.build_sd_strategy()
+    assert str(ctx.value) == params["expected"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.client.static_sd_config": """
                     api/v1 http://api.v1
                     smtp   smtp://host/
                 """
@@ -213,7 +252,9 @@ def test_list_to_dict(params):
     ],
 )
 def test_build_sd_static(params):
-    sd = build_sd_static(params["settings"])
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+
+    sd = builder.build_sd_static()
     assert isinstance(sd, SyncStaticDiscovery)
     assert sd.endpoints == params["expected"]
 
@@ -223,18 +264,22 @@ def test_build_sd_static(params):
     [
         {
             "settings": {
-                "blacksmith.static_sd_config": [
+                "blacksmith.client.service_discovery": "static",
+                "blacksmith.client.static_sd_config": [
                     "api/v1 http://api.v1",
                     "smtp://host/",
-                ]
+                ],
             },
-            "expected": "Invalid value smtp://host/ in blacksmith.static_sd_config[1]",
+            "expected": (
+                "Invalid value smtp://host/ in blacksmith.client.static_sd_config[1]"
+            ),
         },
     ],
 )
 def test_build_sd_static_error(params):
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
     with pytest.raises(ConfigurationError) as ctx:
-        build_sd_static(params["settings"])
+        builder.build_sd_strategy()
     assert str(ctx.value) == params["expected"]
 
 
@@ -243,7 +288,7 @@ def test_build_sd_static_error(params):
     [
         {
             "settings": {
-                "blacksmith.consul_sd_config": """
+                "blacksmith.client.consul_sd_config": """
                     addr                           https://csl.v1/
                     service_name_fmt               {service}${version}
                     service_url_fmt                http://{address}:{port}/api/{version}
@@ -263,7 +308,7 @@ def test_build_sd_static_error(params):
         },
         {
             "settings": {
-                "blacksmith.consul_sd_config": """
+                "blacksmith.client.consul_sd_config": """
                 """
             },
             "expected": {
@@ -277,7 +322,9 @@ def test_build_sd_static_error(params):
     ],
 )
 def test_build_sd_consul(params):
-    sd = build_sd_consul(params["settings"])
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+
+    sd = builder.build_sd_consul()
     assert isinstance(sd, SyncConsulDiscovery)
     if "consul_token" in params["expected"]:
         assert len(sd.blacksmith_cli.middlewares) == 1
@@ -308,7 +355,7 @@ def test_build_sd_consul(params):
     [
         {
             "settings": {
-                "blacksmith.router_sd_config": """
+                "blacksmith.client.router_sd_config": """
                     service_url_fmt             https://r/{service}-{version}
                     unversioned_service_url_fmt https://r/{service}
                 """
@@ -320,7 +367,7 @@ def test_build_sd_consul(params):
         },
         {
             "settings": {
-                "blacksmith.router_sd_config": """
+                "blacksmith.client.router_sd_config": """
                 """
             },
             "expected": {
@@ -331,7 +378,9 @@ def test_build_sd_consul(params):
     ],
 )
 def test_build_sd_router(params):
-    sd = build_sd_router(params["settings"])
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+
+    sd = builder.build_sd_router()
     assert isinstance(sd, SyncRouterDiscovery)
     assert sd.service_url_fmt == params["expected"]["service_url_fmt"]
     assert (
@@ -345,7 +394,7 @@ def test_build_sd_router(params):
     [
         {
             "settings": {
-                "blacksmith.proxies": """
+                "blacksmith.client.proxies": """
                     http://   http://proxy:8080/
                     https://  https://proxy:8443/
                 """
@@ -357,7 +406,7 @@ def test_build_sd_router(params):
         },
         {
             "settings": {
-                "blacksmith.proxies": """
+                "blacksmith.client.proxies": """
                 """
             },
             "expected": None,
@@ -366,7 +415,9 @@ def test_build_sd_router(params):
     ],
 )
 def test_get_proxies(params):
-    proxies = get_proxies(params["settings"])
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+
+    proxies = builder.get_proxies()
     assert proxies == params["expected"]
 
 
@@ -374,15 +425,23 @@ def test_get_proxies(params):
     "params",
     [
         {"settings": {}, "expected": True},
-        {"settings": {"blacksmith.verify_certificate": "true"}, "expected": True},
-        {"settings": {"blacksmith.verify_certificate": "1"}, "expected": True},
-        {"settings": {"blacksmith.verify_certificate": True}, "expected": True},
-        {"settings": {"blacksmith.verify_certificate": "0"}, "expected": False},
-        {"settings": {"blacksmith.verify_certificate": "whatever"}, "expected": False},
+        {
+            "settings": {"blacksmith.client.verify_certificate": "true"},
+            "expected": True,
+        },
+        {"settings": {"blacksmith.client.verify_certificate": "1"}, "expected": True},
+        {"settings": {"blacksmith.client.verify_certificate": True}, "expected": True},
+        {"settings": {"blacksmith.client.verify_certificate": "0"}, "expected": False},
+        {
+            "settings": {"blacksmith.client.verify_certificate": "whatever"},
+            "expected": False,
+        },
     ],
 )
 def test_get_verify_certificate(params):
-    verify = get_verify_certificate(params["settings"])
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+
+    verify = builder.get_verify_certificate()
     assert verify is params["expected"]
 
 
@@ -390,21 +449,23 @@ def test_get_verify_certificate(params):
     "params",
     [
         {"settings": {}, "expected": NoneType},
-        {"settings": {"blacksmith.transport": ""}, "expected": NoneType},
+        {"settings": {"blacksmith.client.transport": ""}, "expected": NoneType},
         {
-            "settings": {"blacksmith.transport": DummyTransport()},
+            "settings": {"blacksmith.client.transport": DummyTransport()},
             "expected": DummyTransport,
         },
         {
             "settings": {
-                "blacksmith.transport": "tests.unittests.fixtures:DummyTransport"
+                "blacksmith.client.transport": "tests.unittests.fixtures:DummyTransport"
             },
             "expected": DummyTransport,
         },
     ],
 )
 def test_build_transport(params):
-    transport = build_transport(params["settings"])
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+
+    transport = builder.build_transport()
     assert isinstance(transport, params["expected"])
 
 
@@ -413,21 +474,25 @@ def test_build_transport(params):
     [
         {"settings": {}, "expected": CollectionParser},
         {
-            "settings": {"blacksmith.collection_parser": ""},
+            "settings": {"blacksmith.client.collection_parser": ""},
             "expected": CollectionParser,
         },
         {
-            "settings": {"blacksmith.collection_parser": DummyCollectionParser},
+            "settings": {"blacksmith.client.collection_parser": DummyCollectionParser},
             "expected": DummyCollectionParser,
         },
         {
             "settings": {
-                "blacksmith.collection_parser": "tests.unittests.fixtures:DummyCollectionParser"
+                "blacksmith.client.collection_parser": (
+                    "tests.unittests.fixtures:DummyCollectionParser"
+                )
             },
             "expected": DummyCollectionParser,
         },
     ],
 )
 def test_build_collection_parser(params):
-    parser = build_collection_parser(params["settings"])
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+
+    parser = builder.build_collection_parser()
     assert parser == params["expected"]
