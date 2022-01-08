@@ -1,12 +1,17 @@
 pyramid-blacksmith
 ==================
 
-.. image:: https://codecov.io/gh/mardiros/pyramid-blacksmith/branch/main/graph/badge.svg?token=9IRABRO2LN
-   :target: https://codecov.io/gh/mardiros/pyramid-blacksmith
+.. image:: https://readthedocs.org/projects/pyramid-blacksmith/badge/?version=latest
+   :target: https://pyramid-blacksmith.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 .. image:: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/main.yml/badge.svg
    :target: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/main.yml
    :alt: Continuous Integration
+
+.. image:: https://codecov.io/gh/mardiros/pyramid-blacksmith/branch/main/graph/badge.svg?token=9IRABRO2LN
+   :target: https://codecov.io/gh/mardiros/pyramid-blacksmith
+   :alt: Coverage
 
 Pyramid bindings for `Blacksmith`_ rest api client.
 
