@@ -11,6 +11,8 @@
    :caption: Users Documentation:
 
    user/introduction
+   user/configuration
+   user/multi_clients
    user/api
    user/changelog
 
