@@ -1,6 +1,7 @@
 import sys
 from pathlib import Path
 from blacksmith.domain.model.params import CollectionParser
+from blacksmith.domain.registry import registry
 
 import pytest
 from blacksmith.domain.model.http import HTTPTimeout
@@ -32,6 +33,7 @@ from tests.unittests.fixtures import DummyCollectionParser, DummyTransport  # no
             "settings": {
                 "blacksmith.client.service_discovery": "consul",
                 "blacksmith.client.consul_sd_config": "",
+                "blacksmith.scan": "tests.unittests.resources",
             },
         }
     ],
@@ -39,6 +41,13 @@ from tests.unittests.fixtures import DummyCollectionParser, DummyTransport  # no
 def test_includeme(config):
     ext = config.registry.queryUtility(IRequestExtensions)
     assert "blacksmith" in ext.descriptors
+
+    # check that the scan is loading resources
+    assert registry.clients == {
+        "api": {"dummy": registry.clients["api"]["dummy"]},
+    }
+    assert registry.clients["api"]["dummy"].collection is None
+    assert registry.clients["api"]["dummy"].resource.path == "/dummies/{name}"
 
 
 @pytest.mark.parametrize(

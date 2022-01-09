@@ -1,4 +1,5 @@
 from typing import Callable, Dict, Optional, Type, cast
+import blacksmith
 from blacksmith.domain.model.params import CollectionParser
 
 import pkg_resources
@@ -204,6 +205,9 @@ def includeme(config: Configurator):
             ...
 
     """
+    resources = aslist(config.registry.settings.get("blacksmith.scan", []))
+    blacksmith.scan(*resources)
+
     config.add_request_method(
         callable=blacksmith_binding_factory(config),
         name="blacksmith",
