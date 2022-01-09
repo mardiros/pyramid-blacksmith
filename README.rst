@@ -20,11 +20,31 @@ Introduction
 ------------
 
 This plugin create a request proterty named ``blacksmith`` that bind
-clients to do API Call using `Blacksmith`_ 
+clients to do API Call using `Blacksmith`_.
 
 
 Clients are configured via the pyramid configurator and its settings.
 
+Then you can access the client factory behind a blacksmith property of
+the request.
 
-.. _`Blacksmith`: https://pypi.org/project/blacksmith/
+
+::
+
+   def my_view(request):
+      api_dummy = request.blacksmith.client("api_dummy")
+      dummy = api_dummy.dummies.get({"name": "alice"})
+
+
+In the example above, a dummy resource has been fetch using the service api_dummy.
+The client method is a configured `Blacksmith Factory`_.
+
+The configuration of the factory is simply made throw the pyramid configurator.
+
+Go ahead and `get familiar with the documentation`_.
+
+
+.. _`Blacksmith`: https://python-blacksmith.readthedocs.io/en/latest/index.html
+.. _`Blacksmith Factory`: https://python-blacksmith.readthedocs.io/en/latest/user/instanciating_client.html#instanciating-client
+.. _`get familiar with the documentation`: https://pyramid-blacksmith.readthedocs.io/
 
