@@ -18,5 +18,6 @@ of the pyramid configutor, usually loaded via a ``paste.ini`` file format.
 Example
 ~~~~~~~
 
-.. literalinclude:: paste.ini
+.. literalinclude:: ../../../examples/consul_template_sd/notif/development.ini
+
 
