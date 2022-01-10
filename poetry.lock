@@ -412,8 +412,19 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "prometheus-client"
+version = "0.12.0"
+description = "Python client for the Prometheus monitoring system."
+category = "main"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[package.extras]
+twisted = ["twisted"]
+
+[[package]]
 name = "purgatory-circuitbreaker"
-version = "0.6.0"
+version = "0.6.1"
 description = "A circuit breaker implementation for asyncio"
 category = "main"
 optional = false
@@ -838,10 +849,13 @@ docs = ["sphinx", "repoze.sphinx.autointerface"]
 test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
+[extras]
+prometheus = ["prometheus-client"]
+
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "e7653e0b9004df49e24bb09a1bfd697ef6434bf6d2759aaf9130fb446ff9552d"
+content-hash = "1342b7f2387d972e38730044882c08c984cf279da2a080d1b16fc04d769b687b"
 
 [metadata.files]
 alabaster = [
@@ -1092,9 +1106,13 @@ pluggy = [
     {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
     {file = "pluggy-1.0.0.tar.gz", hash = "sha256:4224373bacce55f955a878bf9cfa763c1e360858e330072059e10bad68531159"},
 ]
+prometheus-client = [
+    {file = "prometheus_client-0.12.0-py2.py3-none-any.whl", hash = "sha256:317453ebabff0a1b02df7f708efbab21e3489e7072b61cb6957230dd004a0af0"},
+    {file = "prometheus_client-0.12.0.tar.gz", hash = "sha256:1b12ba48cee33b9b0b9de64a1047cbd3c5f2d0ab6ebcead7ddda613a750ec3c5"},
+]
 purgatory-circuitbreaker = [
-    {file = "purgatory-circuitbreaker-0.6.0.tar.gz", hash = "sha256:cdb40a7a5e32a4352a6cc237497761b236ef9b07314973c9439fdeb79f4b9acf"},
-    {file = "purgatory_circuitbreaker-0.6.0-py3-none-any.whl", hash = "sha256:004195768d3f770a64632d0a4421e547dcd307f7ea69dd425d645cfdc44886a6"},
+    {file = "purgatory-circuitbreaker-0.6.1.tar.gz", hash = "sha256:ead61bbaa43f762978f79fc30ffb945e9b50eed8bb8b2e3b698cada588313b06"},
+    {file = "purgatory_circuitbreaker-0.6.1-py3-none-any.whl", hash = "sha256:f5421e54d0401afc186288fa92aed095797cc5d255d82357fbb20f0f6c41bfe8"},
 ]
 py = [
     {file = "py-1.11.0-py2.py3-none-any.whl", hash = "sha256:607c53218732647dff4acdfcd50cb62615cedf612e72d1724fb1a0cc6405b378"},

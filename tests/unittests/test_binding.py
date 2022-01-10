@@ -1,11 +1,12 @@
 import sys
 from pathlib import Path
-from blacksmith.domain.model.params import CollectionParser
-from blacksmith.domain.registry import registry
 
 import pytest
 from blacksmith.domain.model.http import HTTPTimeout
+from blacksmith.domain.model.params import CollectionParser
+from blacksmith.domain.registry import registry
 from blacksmith.middleware._sync.auth import SyncHTTPBearerAuthorization
+from blacksmith.middleware._sync.prometheus import SyncPrometheusMetrics
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
@@ -23,7 +24,11 @@ from pyramid_blacksmith.binding import (
 
 here = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(here))
-from tests.unittests.fixtures import DummyCollectionParser, DummyTransport  # noqa
+from tests.unittests.fixtures import (  # noqa
+    DummyCollectionParser,
+    DummyMiddleware,
+    DummyTransport,
+)
 
 
 @pytest.mark.parametrize(
@@ -505,3 +510,54 @@ def test_build_collection_parser(params):
 
     parser = builder.build_collection_parser()
     assert parser == params["expected"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"settings": {}, "expected": []},
+        {
+            "settings": {
+                "blacksmith.client.middlewares": """
+                    prometheus
+                """
+            },
+            "expected": [SyncPrometheusMetrics],
+        },
+        {
+            "settings": {
+                "blacksmith.client.middlewares": """
+                    dummy       tests.unittests.fixtures:DummyMiddlewareBuilder
+                """
+            },
+            "expected": [DummyMiddleware],
+        },
+    ],
+)
+def test_build_middlewares(params):
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+
+    middlewares = builder.build_middlewares()
+    assert [type(mw) for mw in middlewares] == params["expected"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.client.middlewares": """
+                    dummy       tests.unittests.fixtures:DummyMiddlewareBuilder
+                """,
+                "blacksmith.client.middleware.dummy.tracker": "tracked",
+            },
+            "expected": "tracked",
+        },
+    ],
+)
+def test_build_middlewares_params(params):
+    builder = BlacksmithClientSettingsBuilder(params["settings"])
+
+    middlewares = builder.build_middlewares()
+    middleware = next(middlewares)
+    assert middleware.tracker == params["expected"]
