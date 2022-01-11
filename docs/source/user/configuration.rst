@@ -11,7 +11,7 @@ Loading resources
 
 The first setting is used to fillout the blacksmith registry.
 
-::
+.. code-block:: ini
 
    blacksmith.scan = 
       my.resources
@@ -36,25 +36,27 @@ Example using a static
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: sd/static.ini
+   :language: ini
 
 
 Example using a consul
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: sd/consul.ini
+   :language: ini
 
 
 Example using the router
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: sd/router.ini
+   :language: ini
 
 
 Timeout
 -------
 
-
-::
+.. code-block:: ini
 
    blacksmith.client.timeout = 5
    blacksmith.client.connect_timeout = 2
@@ -63,7 +65,7 @@ Timeout
 Proxies
 -------
 
-::
+.. code-block:: ini
 
    blacksmith.client.proxies = 
       http://   https://letmeout.example.net:8443/
@@ -75,7 +77,7 @@ Proxies
 Disable Certificate Verification
 --------------------------------
 
-::
+.. code-block:: ini
 
    blacksmith.client.verify_certificate = false
 
@@ -93,7 +95,13 @@ While consuming API that does not do bared collection, a collection parser
 has to be set in blacksmith to change the `collection_get` method that
 deserialize and build back the pyrantic model.
 
-::
+.. code-block:: ini
 
    blacksmith.client.collection_parser = path.to.module:MyCollectionParser
 
+
+Middlewares
+-----------
+
+The blacksmith middlewares can also be configured using the configurator,
+this is going to be documented in the next chapter.

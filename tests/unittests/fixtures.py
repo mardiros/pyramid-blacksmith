@@ -5,7 +5,7 @@ from blacksmith.middleware._sync.base import SyncHTTPMiddleware
 from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.typing import HttpMethod
 
-from pyramid_blacksmith.middleware import MiddlewareBuilder
+from pyramid_blacksmith.middleware import AbstractMiddlewareBuilder
 
 
 class DummyTransport(SyncAbstractTransport):
@@ -30,7 +30,7 @@ class DummyMiddleware(SyncHTTPMiddleware):
         return handle
 
 
-class DummyMiddlewareBuilder(MiddlewareBuilder):
+class DummyMiddlewareBuilder(AbstractMiddlewareBuilder):
     def build(self) -> SyncHTTPMiddleware:
         tracker_key = f"{self.prefix}.tracker"
         tracked = self.settings.get(tracker_key)

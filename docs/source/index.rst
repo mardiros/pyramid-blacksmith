@@ -12,6 +12,7 @@
 
    user/introduction
    user/configuration
+   user/middlewares
    user/multi_clients
    user/api
    user/changelog

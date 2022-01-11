@@ -7,5 +7,6 @@ except pkg_resources.DistributionNotFound:
     pass
 
 from .binding import PyramidBlacksmith, includeme
+from .middleware import AbstractMiddlewareBuilder
 
-__all__ = ["PyramidBlacksmith", "includeme"]
+__all__ = ["PyramidBlacksmith", "includeme", "AbstractMiddlewareBuilder"]

@@ -8,7 +8,7 @@ from pyramid.settings import aslist
 from .utils import list_to_dict
 
 
-class MiddlewareBuilder(abc.ABC):
+class AbstractMiddlewareBuilder(abc.ABC):
     def __init__(self, settings, prefix):
         self.settings = settings
         self.prefix = prefix
@@ -18,7 +18,7 @@ class MiddlewareBuilder(abc.ABC):
         """Build the Middleware"""
 
 
-class PrometheusMetricsBuilder(MiddlewareBuilder):
+class PrometheusMetricsBuilder(AbstractMiddlewareBuilder):
     def build(self, registry=REGISTRY) -> SyncPrometheusMetrics:
         buckets = None
         settings = list_to_dict(self.settings, self.prefix)
