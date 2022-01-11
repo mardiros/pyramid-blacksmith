@@ -1,7 +1,6 @@
 from typing import Callable, Dict, Optional, Type, cast
 
 import blacksmith
-import pkg_resources
 from blacksmith import (
     SyncClientFactory,
     SyncConsulDiscovery,
@@ -20,7 +19,7 @@ from pyramid.request import Request
 from pyramid.settings import asbool, aslist
 
 from .typing import Settings
-from .utils import list_to_dict
+from .utils import list_to_dict, resolve_entrypoint
 
 
 class BlacksmithClientSettingsBuilder:
@@ -109,8 +108,7 @@ class BlacksmithClientSettingsBuilder:
             return None
         if isinstance(value, SyncAbstractTransport):
             return value
-        ep = pkg_resources.EntryPoint.parse(f"x={value}")
-        cls = ep.resolve()
+        cls = resolve_entrypoint(value)
         return cls()
 
     def build_collection_parser(self) -> Type[CollectionParser]:
@@ -119,8 +117,7 @@ class BlacksmithClientSettingsBuilder:
             return CollectionParser
         if isinstance(value, type) and issubclass(value, CollectionParser):
             return value
-        ep = pkg_resources.EntryPoint.parse(f"x={value}")
-        cls = ep.resolve()
+        cls = resolve_entrypoint(value)
         return cls
 
     def build_middlewares(self):
@@ -137,8 +134,7 @@ class BlacksmithClientSettingsBuilder:
                 middleware, cls = middleware.split(maxsplit=1)
             except ValueError:
                 cls = classes.get(middleware, middleware)
-            ep = pkg_resources.EntryPoint.parse(f"x={cls}")
-            cls = ep.resolve()
+            cls = resolve_entrypoint(cls)
             yield cls(self.settings, f"{self.prefix}.middleware.{middleware}").build()
 
 

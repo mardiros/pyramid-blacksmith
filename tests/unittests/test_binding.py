@@ -480,7 +480,10 @@ def test_build_collection_parser(params):
 @pytest.mark.parametrize(
     "params",
     [
-        {"settings": {}, "expected": []},
+        {
+            "settings": {},
+            "expected": [],
+        },
         {
             "settings": {
                 "blacksmith.client.middlewares": """
@@ -499,7 +502,7 @@ def test_build_collection_parser(params):
         },
     ],
 )
-def test_build_middlewares(params):
+def test_build_middlewares(registry, params):
     builder = BlacksmithClientSettingsBuilder(params["settings"])
 
     middlewares = builder.build_middlewares()

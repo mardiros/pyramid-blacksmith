@@ -1,6 +1,5 @@
 import pytest
 from blacksmith import __version__ as blacksmith_version
-from prometheus_client import CollectorRegistry
 
 from pyramid_blacksmith.middleware import PrometheusMetricsBuilder
 
@@ -9,23 +8,25 @@ from pyramid_blacksmith.middleware import PrometheusMetricsBuilder
     "params",
     [
         {
-            "settings": {},
+            "settings": {
+                "key": """
+                """
+            },
             "expected_buckets": [0.05, 0.1, 0.2, 0.4, 0.8, 1.6, 3.2, 6.4, 12.8, 25.6],
         },
         {
             "settings": {
                 "key": """
-                    buckets .5 1 5 10
+                    buckets     .5 1 5 10
                 """
             },
             "expected_buckets": [0.5, 1.0, 5.0, 10.0],
         },
     ],
 )
-def test_prometheus_metrics_builder(params):
-    registry = CollectorRegistry()
+def test_prometheus_metrics_builder(registry, params):
     promb = PrometheusMetricsBuilder(params["settings"], "key")
-    prom = promb.build(registry)
+    prom = promb.build()
     val = registry.get_sample_value(
         "blacksmith_info", labels={"version": blacksmith_version}
     )

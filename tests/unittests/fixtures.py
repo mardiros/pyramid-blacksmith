@@ -4,6 +4,7 @@ from blacksmith.domain.typing import SyncMiddleware
 from blacksmith.middleware._sync.base import SyncHTTPMiddleware
 from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.typing import HttpMethod
+from prometheus_client import CollectorRegistry
 
 from pyramid_blacksmith.middleware import AbstractMiddlewareBuilder
 
@@ -35,3 +36,6 @@ class DummyMiddlewareBuilder(AbstractMiddlewareBuilder):
         tracker_key = f"{self.prefix}.tracker"
         tracked = self.settings.get(tracker_key)
         return DummyMiddleware(tracked)
+
+
+registry = CollectorRegistry()
