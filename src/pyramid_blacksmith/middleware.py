@@ -5,6 +5,8 @@ from blacksmith.middleware._sync.base import SyncHTTPMiddleware
 from prometheus_client import REGISTRY
 from pyramid.settings import aslist
 
+from .utils import list_to_dict
+
 
 class MiddlewareBuilder(abc.ABC):
     def __init__(self, settings, prefix):
@@ -19,8 +21,8 @@ class MiddlewareBuilder(abc.ABC):
 class PrometheusMetricsBuilder(MiddlewareBuilder):
     def build(self, registry=REGISTRY) -> SyncPrometheusMetrics:
         buckets = None
-        buckets_key = f"{self.prefix}.buckets"
-        buckets_val = self.settings.get(buckets_key)
+        settings = list_to_dict(self.settings, self.prefix)
+        buckets_val = settings.get("buckets")
         if buckets_val:
             buckets = [float(val) for val in aslist(buckets_val)]
         return SyncPrometheusMetrics(buckets, registry=registry)

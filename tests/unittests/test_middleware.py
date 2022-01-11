@@ -14,8 +14,8 @@ from pyramid_blacksmith.middleware import PrometheusMetricsBuilder
         },
         {
             "settings": {
-                "key.buckets": """
-                    .5 1 5 10
+                "key": """
+                    buckets .5 1 5 10
                 """
             },
             "expected_buckets": [0.5, 1.0, 5.0, 10.0],

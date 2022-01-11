@@ -20,18 +20,7 @@ from pyramid.request import Request
 from pyramid.settings import asbool, aslist
 
 from .typing import Settings
-
-
-def list_to_dict(settings: Settings, setting: str) -> Settings:
-    list_ = aslist(settings[setting], flatten=False)
-    dict_ = {}
-    for idx, param in enumerate(list_):
-        try:
-            key, val = param.split(maxsplit=1)
-            dict_[key] = val
-        except ValueError:
-            raise ConfigurationError(f"Invalid value {param} in {setting}[{idx}]")
-    return dict_
+from .utils import list_to_dict
 
 
 class BlacksmithClientSettingsBuilder:
