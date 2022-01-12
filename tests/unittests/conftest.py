@@ -1,5 +1,5 @@
-from prometheus_client import CollectorRegistry
 import pytest
+from prometheus_client import CollectorRegistry
 from pyramid import testing
 from pyramid.config import Configurator
 from pyramid.interfaces import IRequestExtensions

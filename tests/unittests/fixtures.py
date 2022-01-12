@@ -5,6 +5,7 @@ from blacksmith.middleware._sync.base import SyncHTTPMiddleware
 from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.typing import HttpMethod
 from prometheus_client import CollectorRegistry
+from purgatory import SyncInMemoryUnitOfWork
 
 from pyramid_blacksmith.middleware import AbstractMiddlewareBuilder
 
@@ -39,3 +40,8 @@ class DummyMiddlewareBuilder(AbstractMiddlewareBuilder):
 
 
 registry = CollectorRegistry()
+
+
+class DummyPurgatoryUow(SyncInMemoryUnitOfWork):
+    def __init__(self, url: str):
+        self.url = url

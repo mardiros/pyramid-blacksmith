@@ -128,14 +128,20 @@ class BlacksmithClientSettingsBuilder:
         classes = {
             "prometheus": "pyramid_blacksmith.middleware:PrometheusMetricsBuilder"
         }
-
+        middlewares = {}
         for middleware in value:
             try:
                 middleware, cls = middleware.split(maxsplit=1)
             except ValueError:
                 cls = classes.get(middleware, middleware)
             cls = resolve_entrypoint(cls)
-            yield cls(self.settings, f"{self.prefix}.middleware.{middleware}").build()
+            instance = cls(
+                self.settings,
+                f"{self.prefix}.middleware.{middleware}",
+                middlewares,
+            ).build()
+            yield instance
+            middlewares[middleware] = instance
 
 
 class PyramidBlacksmith:
