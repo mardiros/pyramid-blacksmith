@@ -1,6 +1,11 @@
 import abc
 
-from blacksmith import SyncCircuitBreaker, SyncPrometheusMetrics
+from blacksmith import (
+    SyncCircuitBreaker,
+    SyncPrometheusMetrics,
+    SyncHTTPCachingMiddleware,
+)
+from pyramid.exceptions import ConfigurationError
 from blacksmith.middleware._sync.base import SyncHTTPMiddleware
 from pyramid.settings import aslist
 
@@ -46,3 +51,27 @@ class CircuitBreakerBuilder(AbstractMiddlewareBuilder):
         if "prometheus" in self.middlewares:
             kwargs["prometheus_metrics"] = self.middlewares["prometheus"]
         return SyncCircuitBreaker(**kwargs)
+
+
+class HTTPCachingBuilder(AbstractMiddlewareBuilder):
+    def build(self) -> SyncHTTPCachingMiddleware:
+        import redis  # noqa
+
+        settings = list_to_dict(self.settings, self.prefix)
+        kwargs = {}
+
+        mod = "blacksmith.middleware._sync.http_caching"
+        redis_url = settings.get("redis")
+        if not redis_url:
+            raise ConfigurationError(f"Missing sub-key redis in f{self.prefix}")
+        kwargs["cache"] = redis.from_url(redis_url)
+
+        policy_key = settings.get("policy", f"{mod}:CacheControlPolicy")
+        policy_params = list_to_dict(self.settings, f"{self.prefix}.policy")
+        policy_cls = resolve_entrypoint(policy_key)
+        kwargs["policy"] = policy_cls(**policy_params)
+
+        srlz_key = settings.get("serializer", "json")
+        kwargs["serializer"] = resolve_entrypoint(srlz_key)
+
+        return SyncHTTPCachingMiddleware(**kwargs)

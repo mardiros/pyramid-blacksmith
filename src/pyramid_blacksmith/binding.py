@@ -126,7 +126,9 @@ class BlacksmithClientSettingsBuilder:
         )
 
         classes = {
-            "prometheus": "pyramid_blacksmith.middleware:PrometheusMetricsBuilder"
+            "prometheus": "pyramid_blacksmith.middleware:PrometheusMetricsBuilder",
+            "circuitbreaker": "pyramid_blacksmith.middleware:CircuitBreakerBuilder",
+            "httpcaching": "pyramid_blacksmith.middleware:HTTPCachingBuilder",
         }
         middlewares = {}
         for middleware in value:

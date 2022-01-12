@@ -94,3 +94,44 @@ Using redis as a storage backend
 
    blacksmith.client.middleware.circuitbreaker.uow =
       url   redis://host.example.net/42
+
+
+HTTP Caching Middleware
+-----------------------
+
+.. code-block:: ini
+
+   blacksmith.client.middlewares =
+      httpcaching
+
+   blacksmith.client.middleware.httpcaching =
+      redis       redis://foo.localhost/0
+
+
+To override the policy, or the serializal some additional configuration
+keys are avaiable:
+
+
+.. code-block:: ini
+
+    blacksmith.client.middleware.httpcaching =
+         redis       redis://foo.localhost/0
+         policy      path.to.module:SpecificCachePolicy
+         serializer  path.to.module:SpecificSerializer
+
+   blacksmith.client.middleware.httpcaching.policy =
+      key val
+      key2 val2
+
+
+In that case, the class ``SpecificCachePolicy`` has been created
+in the ``path.to.module`` and implement the ``AbscractCachePolicy``
+of blacksmith. The contructor accept parameter ``key`` and ``key2``.
+Note that, to keep the configuration readable, those parameters must be
+of type ``str``.
+
+By default, the ``serializer`` is ``the json module``.
+The key ``serializer`` accept both ``path.to.module`` and
+``path.to.module:SpecificSerializer``.
+The ``AbstractSerializer`` of blacksmith must be implemented.
+

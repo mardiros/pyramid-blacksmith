@@ -1,14 +1,18 @@
+import json
 from typing import cast
+from blacksmith.middleware._sync.http_caching import CacheControlPolicy
 import pytest
 from blacksmith import __version__ as blacksmith_version
 from blacksmith.middleware._sync.circuit_breaker import PrometheusHook
 from purgatory import SyncInMemoryUnitOfWork
+from redis import Redis
 
 from pyramid_blacksmith.middleware import (
     CircuitBreakerBuilder,
     PrometheusMetricsBuilder,
+    HTTPCachingBuilder,
 )
-from tests.unittests.fixtures import DummyPurgatoryUow
+from tests.unittests.fixtures import DummyCachePolicy, DummyPurgatoryUow, DummySerializer
 
 
 @pytest.mark.parametrize(
@@ -95,3 +99,64 @@ def test_circuit_breaker_with_prometheus(registry):
     circuit = circuitb.build()
     assert len(circuit.circuit_breaker.listeners) == 1
     assert isinstance(list(circuit.circuit_breaker.listeners.keys())[0], PrometheusHook)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "key": """
+                    redis   redis://foo.localhost/0
+                """
+            },
+            "expected_redis": {"db": 0, "host": "foo.localhost"},
+            "expected_policy": CacheControlPolicy,
+            "expected_policy_param": ("sep", "$"),
+            "expected_serializer": json,
+        },
+        {
+            "settings": {
+                "key": """
+                    redis   redis://foo.localhost/0
+                """,
+                "key.policy": """
+                    sep   |
+                """,
+            },
+            "expected_redis": {"db": 0, "host": "foo.localhost"},
+            "expected_policy": CacheControlPolicy,
+            "expected_policy_param": ("sep", "|"),
+            "expected_serializer": json,
+        },
+        {
+            "settings": {
+                "key": """
+                    redis       redis://foo.localhost/0
+                    policy      tests.unittests.fixtures:DummyCachePolicy
+                    serializer  tests.unittests.fixtures:DummySerializer
+                """,
+                "key.policy": """
+                    foo   bar
+                """,
+            },
+            "expected_redis": {"db": 0, "host": "foo.localhost"},
+            "expected_policy": DummyCachePolicy,
+            "expected_policy_param": ("foo", "bar"),
+            "expected_serializer": DummySerializer,
+        },
+    ],
+)
+def test_http_caching_builder(params):
+    cachingb = HTTPCachingBuilder(params["settings"], "key", {})
+    caching = cachingb.build()
+    assert (
+        cast(Redis, caching._cache).connection_pool.connection_kwargs
+        == params["expected_redis"]
+    )
+    assert isinstance(caching._policy, params["expected_policy"])
+    assert caching._serializer is params["expected_serializer"]
+    assert (
+        getattr(caching._policy, params["expected_policy_param"][0])
+        == params["expected_policy_param"][1]
+    )
