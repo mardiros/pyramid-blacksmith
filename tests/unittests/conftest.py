@@ -1,4 +1,5 @@
 import pytest
+from prometheus_client import CollectorRegistry
 from pyramid import testing
 from pyramid.config import Configurator
 from pyramid.interfaces import IRequestExtensions
@@ -23,3 +24,11 @@ def dummy_request(config: Configurator):
     apply_request_extensions(req, exts)
     yield req
     testing.tearDown()
+
+
+@pytest.fixture
+def registry(params):
+    import prometheus_client
+
+    yield prometheus_client.REGISTRY
+    prometheus_client.REGISTRY = CollectorRegistry()

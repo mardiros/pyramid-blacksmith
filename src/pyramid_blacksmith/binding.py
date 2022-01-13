@@ -1,8 +1,6 @@
 from typing import Callable, Dict, Optional, Type, cast
-import blacksmith
-from blacksmith.domain.model.params import CollectionParser
 
-import pkg_resources
+import blacksmith
 from blacksmith import (
     SyncClientFactory,
     SyncConsulDiscovery,
@@ -10,6 +8,7 @@ from blacksmith import (
     SyncStaticDiscovery,
 )
 from blacksmith.domain.model.http import HTTPTimeout
+from blacksmith.domain.model.params import CollectionParser
 from blacksmith.sd._sync.adapters.static import Endpoints
 from blacksmith.sd._sync.base import SyncAbstractServiceDiscovery
 from blacksmith.service._sync.base import SyncAbstractTransport
@@ -19,20 +18,8 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.request import Request
 from pyramid.settings import asbool, aslist
 
-
-Settings = Dict[str, str]
-
-
-def list_to_dict(settings: Settings, setting: str) -> Settings:
-    list_ = aslist(settings[setting], flatten=False)
-    dict_ = {}
-    for idx, param in enumerate(list_):
-        try:
-            key, val = param.split(maxsplit=1)
-            dict_[key] = val
-        except ValueError:
-            raise ConfigurationError(f"Invalid value {param} in {setting}[{idx}]")
-    return dict_
+from .typing import Settings
+from .utils import list_to_dict, resolve_entrypoint
 
 
 class BlacksmithClientSettingsBuilder:
@@ -47,7 +34,7 @@ class BlacksmithClientSettingsBuilder:
         verify = self.get_verify_certificate()
         transport = self.build_transport()
         collection_parser = self.build_collection_parser()
-        return SyncClientFactory(
+        ret = SyncClientFactory(
             sd,
             timeout=timeout,
             proxies=proxies,
@@ -55,6 +42,9 @@ class BlacksmithClientSettingsBuilder:
             transport=transport,
             collection_parser=collection_parser,
         )
+        for mw in self.build_middlewares():
+            ret.add_middleware(mw)
+        return ret
 
     def build_sd_static(self) -> SyncStaticDiscovery:
         key = f"{self.prefix}.static_sd_config"
@@ -118,8 +108,7 @@ class BlacksmithClientSettingsBuilder:
             return None
         if isinstance(value, SyncAbstractTransport):
             return value
-        ep = pkg_resources.EntryPoint.parse(f"x={value}")
-        cls = ep.resolve()
+        cls = resolve_entrypoint(value)
         return cls()
 
     def build_collection_parser(self) -> Type[CollectionParser]:
@@ -128,15 +117,39 @@ class BlacksmithClientSettingsBuilder:
             return CollectionParser
         if isinstance(value, type) and issubclass(value, CollectionParser):
             return value
-        ep = pkg_resources.EntryPoint.parse(f"x={value}")
-        cls = ep.resolve()
+        cls = resolve_entrypoint(value)
         return cls
+
+    def build_middlewares(self):
+        value = aslist(
+            self.settings.get(f"{self.prefix}.middlewares", []), flatten=False
+        )
+
+        classes = {
+            "prometheus": "pyramid_blacksmith.middleware:PrometheusMetricsBuilder",
+            "circuitbreaker": "pyramid_blacksmith.middleware:CircuitBreakerBuilder",
+            "httpcaching": "pyramid_blacksmith.middleware:HTTPCachingBuilder",
+        }
+        middlewares = {}
+        for middleware in value:
+            try:
+                middleware, cls = middleware.split(maxsplit=1)
+            except ValueError:
+                cls = classes.get(middleware, middleware)
+            cls = resolve_entrypoint(cls)
+            instance = cls(
+                self.settings,
+                f"{self.prefix}.middleware.{middleware}",
+                middlewares,
+            ).build()
+            yield instance
+            middlewares[middleware] = instance
 
 
 class PyramidBlacksmith:
     """
     Type of the `request.blacksmith` property.
-    
+
     This can be used to create a ``Protocol`` of the pyramid ``Request``
     in final application for typing purpose.
 
@@ -154,6 +167,7 @@ class PyramidBlacksmith:
             ...
 
     """
+
     def __init__(self, clients: Dict[str, SyncClientFactory]):
         self.clients = clients
 
@@ -194,7 +208,7 @@ def includeme(config: Configurator):
         config.include('pyramid_blacksmith')
 
 
-    This will inject the request property ``request.blacksmith`` like 
+    This will inject the request property ``request.blacksmith`` like
     the pyramid view below:
 
     ::

@@ -1,7 +1,6 @@
 Multiple Clients
 ================
 
-
 Sometime, projects requires multiple api that require different configuration,
 such as different middleware for authentication or discovery mechanism.
 
@@ -12,7 +11,7 @@ the default name is ``client``, but it can be override using the
 
 This settings is a list such as
 
-::
+.. code-block:: ini
 
    blacksmith.clients =
       client_foo
@@ -27,9 +26,11 @@ Example
 ini file
 ~~~~~~~~
 .. literalinclude:: ../../../examples/multi_clients/notif/development.ini
+   :language: ini
 
 
 pyramid views
 ~~~~~~~~~~~~~
 
 .. literalinclude:: ../../../examples/multi_clients/notif/src/notif/__init__.py
+   :language: python

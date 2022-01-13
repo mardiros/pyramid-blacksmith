@@ -1,9 +1,9 @@
 import email as emaillib
 import smtplib
 from textwrap import dedent
-from notif.resources.user import User
-from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 
+from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
+from notif.resources.user import User
 from pyramid.config import Configurator
 
 smtp_sd = SyncConsulDiscovery()

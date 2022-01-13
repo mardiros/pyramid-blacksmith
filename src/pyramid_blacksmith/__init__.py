@@ -6,6 +6,7 @@ except pkg_resources.DistributionNotFound:
     # read the doc does not support poetry
     pass
 
-from .binding import includeme, PyramidBlacksmith
+from .binding import PyramidBlacksmith, includeme
+from .middleware import AbstractMiddlewareBuilder
 
-__all__ = ["PyramidBlacksmith", "includeme"]
+__all__ = ["PyramidBlacksmith", "includeme", "AbstractMiddlewareBuilder"]
