@@ -33,6 +33,7 @@ pytest-cov = "^3.0.0"
 sphinx-rtd-theme = "^1.0.0"
 tomlkit = "^0.8.0"
 redis = "^4.1.0"
+esbonio = "^0.8.0"
 
 [tool.poetry.extras]
 prometheus = ["prometheus-client"]

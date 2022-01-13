@@ -2,11 +2,11 @@ import abc
 
 from blacksmith import (
     SyncCircuitBreaker,
-    SyncPrometheusMetrics,
     SyncHTTPCachingMiddleware,
+    SyncPrometheusMetrics,
 )
-from pyramid.exceptions import ConfigurationError
 from blacksmith.middleware._sync.base import SyncHTTPMiddleware
+from pyramid.exceptions import ConfigurationError
 from pyramid.settings import aslist
 
 from .utils import list_to_dict, resolve_entrypoint
@@ -63,7 +63,7 @@ class HTTPCachingBuilder(AbstractMiddlewareBuilder):
         mod = "blacksmith.middleware._sync.http_caching"
         redis_url = settings.get("redis")
         if not redis_url:
-            raise ConfigurationError(f"Missing sub-key redis in f{self.prefix}")
+            raise ConfigurationError(f"Missing sub-key redis in setting {self.prefix}")
         kwargs["cache"] = redis.from_url(redis_url)
 
         policy_key = settings.get("policy", f"{mod}:CacheControlPolicy")

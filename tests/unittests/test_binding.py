@@ -6,6 +6,7 @@ from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.domain.model.params import CollectionParser
 from blacksmith.domain.registry import registry
 from blacksmith.middleware._sync.auth import SyncHTTPBearerAuthorization
+from blacksmith.middleware._sync.circuit_breaker import SyncCircuitBreaker
 from blacksmith.middleware._sync.prometheus import SyncPrometheusMetrics
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
@@ -61,6 +62,7 @@ def test_includeme(config):
             "settings": {
                 "blacksmith.client.service_discovery": "consul",
                 "blacksmith.client.consul_sd_config": "",
+                "blacksmith.client.middlewares": ["prometheus", "circuitbreaker"],
             },
             "expected": {
                 "sd": SyncConsulDiscovery,
@@ -69,6 +71,7 @@ def test_includeme(config):
                 "verify": True,
                 "transport": SyncHttpxTransport,
                 "collection_parser": CollectionParser,
+                "middlewares": [SyncCircuitBreaker, SyncPrometheusMetrics],
             },
         },
         {
@@ -88,6 +91,7 @@ def test_includeme(config):
                 "verify": False,
                 "transport": SyncHttpxTransport,
                 "collection_parser": DummyCollectionParser,
+                "middlewares": [],
             },
         },
         {
@@ -103,6 +107,7 @@ def test_includeme(config):
                 "verify": True,
                 "transport": DummyTransport,
                 "collection_parser": CollectionParser,
+                "middlewares": [],
             },
         },
     ],
@@ -127,6 +132,9 @@ def test_req_attr(params, dummy_request):
         dummy_request.blacksmith.client.collection_parser
         is params["expected"]["collection_parser"]
     )
+    assert [type(m) for m in dummy_request.blacksmith.client.middlewares] == params[
+        "expected"
+    ]["middlewares"]
 
 
 @pytest.mark.parametrize(
@@ -157,6 +165,9 @@ def test_multi_client(params, dummy_request):
     assert isinstance(
         dummy_request.blacksmith.client2.sd, params["expected"]["client2"]
     )
+    with pytest.raises(AttributeError) as ctx:
+        dummy_request.blacksmith.client3
+    assert str(ctx.value) == "Client 'client3' is not registered"
 
 
 @pytest.mark.parametrize(

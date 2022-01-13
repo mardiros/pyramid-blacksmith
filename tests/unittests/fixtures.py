@@ -2,11 +2,11 @@ from blacksmith.domain.model import HTTPRequest, HTTPResponse, HTTPTimeout
 from blacksmith.domain.model.params import CollectionParser
 from blacksmith.domain.typing import SyncMiddleware
 from blacksmith.middleware._sync.base import SyncHTTPMiddleware
-from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.middleware._sync.http_caching import (
     AbstractCachingPolicy,
     AbstractSerializer,
 )
+from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.typing import HttpMethod
 from prometheus_client import CollectorRegistry
 from purgatory import SyncInMemoryUnitOfWork

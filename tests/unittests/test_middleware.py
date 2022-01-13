@@ -1,18 +1,24 @@
 import json
 from typing import cast
-from blacksmith.middleware._sync.http_caching import CacheControlPolicy
+
 import pytest
 from blacksmith import __version__ as blacksmith_version
 from blacksmith.middleware._sync.circuit_breaker import PrometheusHook
+from blacksmith.middleware._sync.http_caching import CacheControlPolicy
 from purgatory import SyncInMemoryUnitOfWork
+from pyramid.config import ConfigurationError
 from redis import Redis
 
 from pyramid_blacksmith.middleware import (
     CircuitBreakerBuilder,
-    PrometheusMetricsBuilder,
     HTTPCachingBuilder,
+    PrometheusMetricsBuilder,
 )
-from tests.unittests.fixtures import DummyCachePolicy, DummyPurgatoryUow, DummySerializer
+from tests.unittests.fixtures import (
+    DummyCachePolicy,
+    DummyPurgatoryUow,
+    DummySerializer,
+)
 
 
 @pytest.mark.parametrize(
@@ -160,3 +166,24 @@ def test_http_caching_builder(params):
         getattr(caching._policy, params["expected_policy_param"][0])
         == params["expected_policy_param"][1]
     )
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "key": """
+                """
+            },
+        },
+        {
+            "settings": {},
+        },
+    ],
+)
+def test_http_caching_builder_error(params):
+    cachingb = HTTPCachingBuilder(params["settings"], "key", {})
+    with pytest.raises(ConfigurationError) as ctx:
+        cachingb.build()
+    assert str(ctx.value) == "Missing sub-key redis in setting key"
