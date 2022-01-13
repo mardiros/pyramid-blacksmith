@@ -2,9 +2,11 @@ Configuration
 =============
 
 pyramid_blacksmith is configuring the clients using the ``settings``
-of the pyramid configutor, usually loaded via a ``paste.ini`` file format.
+of the pyramid `configurator`_, usually loaded via a ``paste.ini`` file format.
 
 The configuration here will use this format for clarity.
+
+.. _`configurator`: https://docs.pylonsproject.org/projects/pyramid/en/latest/api/config.html#pyramid.config.Configurator
 
 Loading resources
 -----------------
