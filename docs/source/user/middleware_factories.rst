@@ -1,5 +1,5 @@
-Middlewares Factories
-=====================
+Middleware Factories
+====================
 
 The middleware factory differ from the middleware in their need and usage.
 A middleware is global, and, sometimes, middleware data may differ per 
@@ -14,14 +14,14 @@ Forward http headers
 --------------------
 
 The list of middleware are defined under the 
-setting key ``blacksmith.client.middlewares_factories``, as in the example above.
+setting key ``blacksmith.client.middleware_factories``, as in the example above.
 
 .. code-block:: ini
 
-   blacksmith.client.middlewares_factories =
+   blacksmith.client.middleware_factories =
       forward_header
 
-   blacksmith.client.middlewares_factory.forward_header =
+   blacksmith.client.middleware_factory.forward_header =
       Authorization
 
 Then each middleware should be configured under the key
@@ -40,7 +40,7 @@ To load a custom middleware, a class can be passed on the same line
 
 .. code-block:: ini
 
-   blacksmith.client.middlewares_factories =
+   blacksmith.client.middleware_factories =
       mybuilder  my.own.module:MyMiddlewareBuilder
 
 

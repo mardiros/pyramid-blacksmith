@@ -13,7 +13,7 @@
    user/introduction
    user/configuration
    user/middlewares
-   user/middlewares_factories
+   user/middleware_factories
    user/multi_clients
    user/api
    user/changelog

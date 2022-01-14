@@ -549,8 +549,8 @@ def test_build_middlewares_params(params):
     [
         {
             "settings": {
-                "blacksmith.client.middlewares_factories": ["forward_header"],
-                "blacksmith.client.middlewares_factory.forward_header": """
+                "blacksmith.client.middleware_factories": ["forward_header"],
+                "blacksmith.client.middleware_factory.forward_header": """
                         Authorization
                 """,
             },

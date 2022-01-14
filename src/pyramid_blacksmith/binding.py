@@ -158,7 +158,7 @@ class BlacksmithMiddlewareFactoryBuilder:
         blacksmith.client.middleware_factories =
             forward_header
 
-        blacksmith.client.middlewares_factory.forward_header =
+        blacksmith.client.middleware_factory.forward_header =
             Authorization
 
     """
@@ -174,7 +174,7 @@ class BlacksmithMiddlewareFactoryBuilder:
             ),
         }
         value = aslist(
-            self.settings.get(f"{self.prefix}.middlewares_factories", []), flatten=False
+            self.settings.get(f"{self.prefix}.middleware_factories", []), flatten=False
         )
         for middleware in value:
             try:
@@ -182,7 +182,7 @@ class BlacksmithMiddlewareFactoryBuilder:
             except ValueError:
                 cls = classes.get(middleware, middleware)
 
-            key = f"{self.prefix}.middlewares_factory.{middleware}"
+            key = f"{self.prefix}.middleware_factory.{middleware}"
             kwargs = list_to_dict(self.settings, key, with_flag=True)
             cls = resolve_entrypoint(cls)
             yield cls(**kwargs)
