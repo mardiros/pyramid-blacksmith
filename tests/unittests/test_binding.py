@@ -19,8 +19,10 @@ from pyramid.interfaces import IRequestExtensions
 
 from pyramid_blacksmith.binding import (
     BlacksmithClientSettingsBuilder,
+    BlacksmithMiddlewareFactoryBuilder,
     PyramidBlacksmith,
 )
+from pyramid_blacksmith.middleware_factory import ForwardHeaderFactoryBuilder
 
 here = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(here))
@@ -540,3 +542,23 @@ def test_build_middlewares_params(params):
     middlewares = builder.build_middlewares()
     middleware = next(middlewares)
     assert middleware.tracker == params["expected"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "blacksmith.client.middlewares_factories": ["forward_header"],
+                "blacksmith.client.middlewares_factory.forward_header": """
+                        Authorization
+                """,
+            },
+            "expected": [ForwardHeaderFactoryBuilder],
+        },
+    ],
+)
+def test_build_middleware_factory_builder(params):
+    builder = BlacksmithMiddlewareFactoryBuilder(params["settings"])
+    factories = [type(f) for f in builder.build()]
+    assert factories == params["expected"]

@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Optional, Type, cast
+from typing import Callable, Dict, Iterator, List, Optional, Type, cast
 
 import blacksmith
 from blacksmith import (
@@ -17,6 +17,8 @@ from pyramid.config import Configurator
 from pyramid.exceptions import ConfigurationError
 from pyramid.request import Request
 from pyramid.settings import asbool, aslist
+
+from pyramid_blacksmith.middleware_factory import HTTPMiddlewareFactoryBuilder
 
 from .typing import Settings
 from .utils import list_to_dict, resolve_entrypoint
@@ -146,6 +148,45 @@ class BlacksmithClientSettingsBuilder:
             middlewares[middleware] = instance
 
 
+class BlacksmithMiddlewareFactoryBuilder:
+    """
+    Parse the settings like:
+
+    ::
+
+        blacksmith.client.middleware_factories =
+            forward_header
+
+        blacksmith.client.middlewares_factory.forward_header =
+            Authorization
+
+    """
+
+    def __init__(self, settings: Settings, prefix: str = "client"):
+        self.settings = settings
+        self.prefix = f"blacksmith.{prefix}"
+
+    def build(self) -> Iterator[HTTPMiddlewareFactoryBuilder]:
+        classes = {
+            "forward_header": (
+                "pyramid_blacksmith.middleware_factory:ForwardHeaderFactoryBuilder"
+            ),
+        }
+        value = aslist(
+            self.settings.get(f"{self.prefix}.middlewares_factories", []), flatten=False
+        )
+        for middleware in value:
+            try:
+                middleware, cls = middleware.split(maxsplit=1)
+            except ValueError:
+                cls = classes.get(middleware, middleware)
+
+            key = f"{self.prefix}.middlewares_factory.{middleware}"
+            kwargs = list_to_dict(self.settings, key, with_flag=True)
+            cls = resolve_entrypoint(cls)
+            yield cls(**kwargs)
+
+
 class PyramidBlacksmith:
     """
     Type of the `request.blacksmith` property.
@@ -168,17 +209,29 @@ class PyramidBlacksmith:
 
     """
 
-    def __init__(self, clients: Dict[str, SyncClientFactory]):
+    def __init__(
+        self,
+        request: Request,
+        clients: Dict[str, SyncClientFactory],
+        middleware_factories: Dict[str, List[HTTPMiddlewareFactoryBuilder]],
+    ):
+        self.request = request
         self.clients = clients
+        self.middleware_factories = middleware_factories
 
     def __getattr__(self, name: str) -> SyncClientFactory:
         """
         Return the blacksmith client factory named in the configuration.
         """
         try:
-            return self.clients[name]
+            cli = self.clients[name]
         except KeyError as k:
             raise AttributeError(f"Client {k} is not registered")
+
+        for middleware_factory in self.middleware_factories.get(name, []):
+            cli.add_middleware(middleware_factory(self.request))
+
+        return cli
 
 
 def blacksmith_binding_factory(
@@ -191,10 +244,14 @@ def blacksmith_binding_factory(
         key: BlacksmithClientSettingsBuilder(settings, key).build()
         for key in clients_key
     }
-    clients = PyramidBlacksmith(clients_dict)
+
+    middleware_factories = {
+        key: list(BlacksmithMiddlewareFactoryBuilder(settings, key).build())
+        for key in clients_key
+    }
 
     def blacksmith_binding(request: Request) -> PyramidBlacksmith:
-        return clients
+        return PyramidBlacksmith(request, clients_dict, middleware_factories)
 
     return blacksmith_binding
 
