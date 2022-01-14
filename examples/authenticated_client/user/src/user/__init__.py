@@ -36,7 +36,7 @@ async def show_user(request):
     except Exception:
         return JSONResponse({"detail": "Malformed authorization"}, status_code=400)
 
-    if scheme != "Bearer" and value != "kinoe":
+    if scheme != "Bearer" or value != "kinoe":
         return JSONResponse({"detail": "Forbidden"}, status_code=403)
 
     username = request.path_params["username"]
