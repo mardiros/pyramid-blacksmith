@@ -13,6 +13,7 @@
    user/introduction
    user/configuration
    user/middlewares
+   user/middlewares_factories
    user/multi_clients
    user/api
    user/changelog
@@ -21,7 +22,10 @@
    :maxdepth: 1
    :caption: Developers Documentation:
 
-   develop/api
+   develop/binding
+   develop/middleware
+   develop/middleware_factory
+   develop/utils
 
 Indices and tables
 ==================

@@ -6,6 +6,7 @@ from blacksmith import (
     SyncConsulDiscovery,
     SyncRouterDiscovery,
     SyncStaticDiscovery,
+    SyncHTTPMiddleware,
 )
 from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.domain.model.params import CollectionParser
@@ -18,7 +19,7 @@ from pyramid.exceptions import ConfigurationError
 from pyramid.request import Request
 from pyramid.settings import asbool, aslist
 
-from pyramid_blacksmith.middleware_factory import HTTPMiddlewareFactoryBuilder
+from pyramid_blacksmith.middleware_factory import AbstractMiddlewareFactoryBuilder
 
 from .typing import Settings
 from .utils import list_to_dict, resolve_entrypoint
@@ -122,7 +123,7 @@ class BlacksmithClientSettingsBuilder:
         cls = resolve_entrypoint(value)
         return cls
 
-    def build_middlewares(self):
+    def build_middlewares(self) -> Iterator[SyncHTTPMiddleware]:
         value = aslist(
             self.settings.get(f"{self.prefix}.middlewares", []), flatten=False
         )
@@ -166,7 +167,7 @@ class BlacksmithMiddlewareFactoryBuilder:
         self.settings = settings
         self.prefix = f"blacksmith.{prefix}"
 
-    def build(self) -> Iterator[HTTPMiddlewareFactoryBuilder]:
+    def build(self) -> Iterator[AbstractMiddlewareFactoryBuilder]:
         classes = {
             "forward_header": (
                 "pyramid_blacksmith.middleware_factory:ForwardHeaderFactoryBuilder"
@@ -213,7 +214,7 @@ class PyramidBlacksmith:
         self,
         request: Request,
         clients: Dict[str, SyncClientFactory],
-        middleware_factories: Dict[str, List[HTTPMiddlewareFactoryBuilder]],
+        middleware_factories: Dict[str, List[AbstractMiddlewareFactoryBuilder]],
     ):
         self.request = request
         self.clients = clients
