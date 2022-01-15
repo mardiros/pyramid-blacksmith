@@ -20,6 +20,7 @@ class ForwardHeaderFactoryBuilder(AbstractMiddlewareFactoryBuilder):
 
     :param kwargs: headers
     """
+
     def __init__(self, **kwargs: Dict[str, bool]):
         self.headers = list(kwargs.keys())
 

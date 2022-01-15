@@ -6,6 +6,7 @@ from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.domain.model.params import CollectionParser
 from blacksmith.domain.registry import registry
 from blacksmith.middleware._sync.auth import SyncHTTPBearerAuthorization
+from blacksmith.middleware._sync.base import SyncHTTPAddHeadersMiddleware
 from blacksmith.middleware._sync.circuit_breaker import SyncCircuitBreaker
 from blacksmith.middleware._sync.prometheus import SyncPrometheusMetrics
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
@@ -62,81 +63,110 @@ def test_includeme(config):
     [
         {
             "settings": {
-                "blacksmith.client.service_discovery": "consul",
-                "blacksmith.client.consul_sd_config": "",
+                "blacksmith.client.service_discovery": "router",
                 "blacksmith.client.middlewares": ["prometheus", "circuitbreaker"],
+                "blacksmith.client.middleware_factories": ["forward_header"],
+                "blacksmith.client.middleware_factorie.forward_header": ["foo"],
+                "blacksmith.scan": "tests.unittests.resources",
             },
             "expected": {
-                "sd": SyncConsulDiscovery,
+                "sd": SyncRouterDiscovery,
                 "timeout": HTTPTimeout(30, 15),
                 "proxies": None,
                 "verify": True,
                 "transport": SyncHttpxTransport,
                 "collection_parser": CollectionParser,
-                "middlewares": [SyncCircuitBreaker, SyncPrometheusMetrics],
+                "middlewares": [
+                    SyncCircuitBreaker,
+                    SyncPrometheusMetrics,
+                ],
+                "middleware_factories": [
+                    SyncHTTPAddHeadersMiddleware,
+                    SyncCircuitBreaker,
+                    SyncPrometheusMetrics,
+                ],
             },
         },
         {
             "settings": {
-                "blacksmith.client.service_discovery": "consul",
-                "blacksmith.client.consul_sd_config": "",
+                "blacksmith.client.service_discovery": "router",
+                "blacksmith.client.router_sd_config": "",
                 "blacksmith.client.timeout": "5",
                 "blacksmith.client.connect_timeout": "2",
                 "blacksmith.client.proxies": ["http://  http//p/"],
                 "blacksmith.client.verify_certificate": False,
                 "blacksmith.client.collection_parser": DummyCollectionParser,
+                "blacksmith.scan": "tests.unittests.resources",
             },
             "expected": {
-                "sd": SyncConsulDiscovery,
+                "sd": SyncRouterDiscovery,
                 "timeout": HTTPTimeout(5, 2),
                 "proxies": {"http://": "http//p/"},
                 "verify": False,
                 "transport": SyncHttpxTransport,
                 "collection_parser": DummyCollectionParser,
                 "middlewares": [],
+                "middleware_factories": [],
             },
         },
         {
             "settings": {
-                "blacksmith.client.service_discovery": "consul",
-                "blacksmith.client.consul_sd_config": "",
+                "blacksmith.client.service_discovery": "router",
+                "blacksmith.client.router_sd_config": "",
                 "blacksmith.client.transport": DummyTransport(),
+                "blacksmith.scan": "tests.unittests.resources",
             },
             "expected": {
-                "sd": SyncConsulDiscovery,
+                "sd": SyncRouterDiscovery,
                 "timeout": HTTPTimeout(30, 15),
                 "proxies": None,
                 "verify": True,
                 "transport": DummyTransport,
                 "collection_parser": CollectionParser,
                 "middlewares": [],
+                "middleware_factories": [],
             },
         },
     ],
 )
 def test_req_attr(params, dummy_request):
     assert isinstance(dummy_request.blacksmith, PyramidBlacksmith)
-    assert isinstance(dummy_request.blacksmith.client, SyncClientFactory)
-    assert isinstance(dummy_request.blacksmith.client.sd, params["expected"]["sd"])
-    assert dummy_request.blacksmith.client.timeout == params["expected"]["timeout"]
+    assert isinstance(dummy_request.blacksmith.clients["client"], SyncClientFactory)
+    assert isinstance(
+        dummy_request.blacksmith.clients["client"].sd, params["expected"]["sd"]
+    )
     assert (
-        dummy_request.blacksmith.client.transport.proxies
+        dummy_request.blacksmith.clients["client"].timeout
+        == params["expected"]["timeout"]
+    )
+    assert (
+        dummy_request.blacksmith.clients["client"].transport.proxies
         == params["expected"]["proxies"]
     )
     assert (
-        dummy_request.blacksmith.client.transport.verify_certificate
+        dummy_request.blacksmith.clients["client"].transport.verify_certificate
         == params["expected"]["verify"]
     )
     assert isinstance(
-        dummy_request.blacksmith.client.transport, params["expected"]["transport"]
+        dummy_request.blacksmith.clients["client"].transport,
+        params["expected"]["transport"],
     )
     assert (
-        dummy_request.blacksmith.client.collection_parser
+        dummy_request.blacksmith.clients["client"].collection_parser
         is params["expected"]["collection_parser"]
     )
-    assert [type(m) for m in dummy_request.blacksmith.client.middlewares] == params[
-        "expected"
-    ]["middlewares"]
+    assert [
+        type(m) for m in dummy_request.blacksmith.clients["client"].middlewares
+    ] == params["expected"]["middlewares"]
+
+    assert [
+        type(m) for m in dummy_request.blacksmith.client("api").middlewares
+    ] == params["expected"]["middleware_factories"]
+
+    # Ensure there is not two middleware here
+    assert [
+        type(m) for m in dummy_request.blacksmith.client("api").middlewares
+    ] == params["expected"]["middleware_factories"]
 
 
 @pytest.mark.parametrize(
@@ -152,6 +182,7 @@ def test_req_attr(params, dummy_request):
                 "blacksmith.client1.consul_sd_config": "",
                 "blacksmith.client2.service_discovery": "static",
                 "blacksmith.client2.static_sd_config": [],
+                "blacksmith.scan": "tests.unittests.resources",
             },
             "expected": {
                 "client1": SyncConsulDiscovery,
@@ -162,13 +193,13 @@ def test_req_attr(params, dummy_request):
 )
 def test_multi_client(params, dummy_request):
     assert isinstance(
-        dummy_request.blacksmith.client1.sd, params["expected"]["client1"]
+        dummy_request.blacksmith.clients["client1"].sd, params["expected"]["client1"]
     )
     assert isinstance(
-        dummy_request.blacksmith.client2.sd, params["expected"]["client2"]
+        dummy_request.blacksmith.clients["client2"].sd, params["expected"]["client2"]
     )
     with pytest.raises(AttributeError) as ctx:
-        dummy_request.blacksmith.client3
+        dummy_request.blacksmith.client3("api")
     assert str(ctx.value) == "Client 'client3' is not registered"
 
 

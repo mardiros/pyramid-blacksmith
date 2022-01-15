@@ -4,9 +4,9 @@ import blacksmith
 from blacksmith import (
     SyncClientFactory,
     SyncConsulDiscovery,
+    SyncHTTPMiddleware,
     SyncRouterDiscovery,
     SyncStaticDiscovery,
-    SyncHTTPMiddleware,
 )
 from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.domain.model.params import CollectionParser
@@ -220,19 +220,23 @@ class PyramidBlacksmith:
         self.clients = clients
         self.middleware_factories = middleware_factories
 
-    def __getattr__(self, name: str) -> SyncClientFactory:
+    def __getattr__(self, name: str) -> Callable:
         """
         Return the blacksmith client factory named in the configuration.
         """
-        try:
-            cli = self.clients[name]
-        except KeyError as k:
-            raise AttributeError(f"Client {k} is not registered")
 
-        for middleware_factory in self.middleware_factories.get(name, []):
-            cli.add_middleware(middleware_factory(self.request))
+        def get_client(client_name):
+            try:
+                client_factory = self.clients[name]
+            except KeyError as k:
+                raise AttributeError(f"Client {k} is not registered")
 
-        return cli
+            cli = client_factory(client_name)
+            for middleware_factory in self.middleware_factories.get(name, []):
+                cli.add_middleware(middleware_factory(self.request))
+            return cli
+
+        return get_client
 
 
 def blacksmith_binding_factory(
