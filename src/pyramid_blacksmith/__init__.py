@@ -8,5 +8,11 @@ except pkg_resources.DistributionNotFound:
 
 from .binding import PyramidBlacksmith, includeme
 from .middleware import AbstractMiddlewareBuilder
+from .middleware_factory import AbstractMiddlewareFactoryBuilder
 
-__all__ = ["PyramidBlacksmith", "includeme", "AbstractMiddlewareBuilder"]
+__all__ = [
+    "PyramidBlacksmith",
+    "includeme",
+    "AbstractMiddlewareBuilder",
+    "AbstractMiddlewareFactoryBuilder",
+]

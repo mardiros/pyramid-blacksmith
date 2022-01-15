@@ -7,7 +7,11 @@ from pyramid.settings import aslist
 from .typing import Settings
 
 
-def list_to_dict(settings: Settings, setting: str) -> Settings:
+def list_to_dict(
+    settings: Settings,
+    setting: str,
+    with_flag=False,
+) -> Settings:
     """
     Cast the setting ``setting`` from the settings `settings`.
 
@@ -16,12 +20,13 @@ def list_to_dict(settings: Settings, setting: str) -> Settings:
         setting =
             key value
             key2 yet another value
+            flag_key
 
     will return
 
     .. code-block:: python
 
-        {"key": "value", "key2": "yet another value"}
+        {"key": "value", "key2": "yet another value", "flag_key": True}
 
     """
     list_ = aslist(settings.get(setting, ""), flatten=False)
@@ -31,7 +36,10 @@ def list_to_dict(settings: Settings, setting: str) -> Settings:
             key, val = param.split(maxsplit=1)
             dict_[key] = val
         except ValueError:
-            raise ConfigurationError(f"Invalid value {param} in {setting}[{idx}]")
+            if with_flag:
+                dict_[param] = True
+            else:
+                raise ConfigurationError(f"Invalid value {param} in {setting}[{idx}]")
     return dict_
 
 
