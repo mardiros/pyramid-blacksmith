@@ -7,7 +7,7 @@ doc:
 cleandoc:
     cd docs && poetry run make clean
 
-test: unittest lint
+test: unittest lint mypy
 
 lf:
     poetry run pytest -sxvvv --lf

@@ -6,8 +6,8 @@ from blacksmith import (
     SyncPrometheusMetrics,
 )
 from blacksmith.middleware._sync.base import SyncHTTPMiddleware
-from pyramid.exceptions import ConfigurationError
-from pyramid.settings import aslist
+from pyramid.exceptions import ConfigurationError  # type: ignore
+from pyramid.settings import aslist  # type: ignore
 
 from .utils import list_to_dict, resolve_entrypoint
 
@@ -19,7 +19,7 @@ class AbstractMiddlewareBuilder(abc.ABC):
         self.middlewares = middlewares
 
     @abc.abstractmethod
-    def build(self, *args) -> SyncHTTPMiddleware:
+    def build(self) -> SyncHTTPMiddleware:
         """Build the Middleware"""
 
 
@@ -50,7 +50,7 @@ class CircuitBreakerBuilder(AbstractMiddlewareBuilder):
         kwargs["uow"] = uow_cls(**uow_kwargs)
         if "prometheus" in self.middlewares:
             kwargs["prometheus_metrics"] = self.middlewares["prometheus"]
-        return SyncCircuitBreaker(**kwargs)
+        return SyncCircuitBreaker(**kwargs)  # type: ignore
 
 
 class HTTPCachingBuilder(AbstractMiddlewareBuilder):
@@ -72,6 +72,5 @@ class HTTPCachingBuilder(AbstractMiddlewareBuilder):
         kwargs["policy"] = policy_cls(**policy_params)
 
         srlz_key = settings.get("serializer", "json")
-        kwargs["serializer"] = resolve_entrypoint(srlz_key)
-
-        return SyncHTTPCachingMiddleware(**kwargs)
+        kwargs["serializer"] = resolve_entrypoint(srlz_key)  # type: ignore
+        return SyncHTTPCachingMiddleware(**kwargs)  # type: ignore

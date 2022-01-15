@@ -3,7 +3,7 @@ import abc
 from typing import Dict
 
 from blacksmith import SyncHTTPAddHeadersMiddleware, SyncHTTPMiddleware
-from pyramid.request import Request
+from pyramid.request import Request  # type: ignore
 
 
 class AbstractMiddlewareFactoryBuilder(abc.ABC):

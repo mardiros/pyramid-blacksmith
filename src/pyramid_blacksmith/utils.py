@@ -1,8 +1,8 @@
 from typing import Type
 
 import pkg_resources
-from pyramid.exceptions import ConfigurationError
-from pyramid.settings import aslist
+from pyramid.exceptions import ConfigurationError  # type: ignore
+from pyramid.settings import aslist  # type: ignore
 
 from .typing import Settings
 

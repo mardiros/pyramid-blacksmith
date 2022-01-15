@@ -1,3 +1,3 @@
-from typing import Dict
+from typing import Mapping
 
-Settings = Dict[str, str]
+Settings = Mapping[str, str]
