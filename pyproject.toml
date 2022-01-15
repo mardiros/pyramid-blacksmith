@@ -16,7 +16,7 @@ repository = "https://github.com/mardiros/pyramid-blacksmith"
 version = "0.2.0"
 
 [tool.poetry.dependencies]
-blacksmith = "^0.10.0"
+blacksmith = "^0.11.0"
 prometheus-client = "^0.12.0"
 pyramid = ">1.10, ^2.0"
 python = "^3.7"
@@ -34,6 +34,9 @@ sphinx-rtd-theme = "^1.0.0"
 tomlkit = "^0.8.0"
 redis = "^4.1.0"
 esbonio = "^0.8.0"
+mypy = "^0.931"
+types-redis = "^4.1.8"
+types-setuptools = "^57.4.7"
 
 [tool.poetry.extras]
 prometheus = ["prometheus-client"]

@@ -18,6 +18,9 @@ unittest test_suite=default_test_suite:
 lint:
     poetry run flake8
 
+mypy:
+    poetry run mypy src/pyramid_blacksmith/
+
 black:
     poetry run isort .
     poetry run black .
