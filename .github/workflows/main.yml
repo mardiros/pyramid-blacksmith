@@ -38,6 +38,14 @@ jobs:
         run: |
           poetry run pytest tests/unittests  --junitxml=junit/test-results-${{ matrix.python-version }}.xml --cov=pyramid_blacksmith --cov-report=xml --cov-report=html
 
+      - name: Check lint
+        run: |
+          poetry run flake8 .
+
+      - name: Check types
+        run: |
+          poetry run mypy src/pyramid_blacksmith
+
       - name: Upload pytest test results
         uses: actions/upload-artifact@v2
         with:
