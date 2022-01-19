@@ -1,7 +1,8 @@
-from typing import Callable, Dict, Iterator, List, Optional, Type, cast
+from typing import Any, Callable, Dict, Iterator, List, Optional, Type, cast
 
 import blacksmith
 from blacksmith import (
+    SyncClient,
     SyncClientFactory,
     SyncConsulDiscovery,
     SyncHTTPMiddleware,
@@ -13,7 +14,7 @@ from blacksmith.domain.model.params import CollectionParser
 from blacksmith.sd._sync.base import SyncAbstractServiceDiscovery
 from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.typing import Proxies, Service, Url
-from pyramid.config import Configurator  # type: ignore
+from pyramid.config import Configurator   # type: ignore
 from pyramid.exceptions import ConfigurationError  # type: ignore
 from pyramid.request import Request  # type: ignore
 from pyramid.settings import asbool, aslist  # type: ignore
@@ -29,14 +30,14 @@ class BlacksmithClientSettingsBuilder:
         self.settings = settings
         self.prefix = f"blacksmith.{prefix}"
 
-    def build(self) -> SyncClientFactory:
+    def build(self) -> SyncClientFactory[Any, Any]:
         sd = self.build_sd_strategy()
         timeout = self.get_timeout()
         proxies = self.get_proxies()
         verify = self.get_verify_certificate()
         transport = self.build_transport()
         collection_parser = self.build_collection_parser()
-        ret = SyncClientFactory(
+        ret: SyncClientFactory[Any, Any] = SyncClientFactory(
             sd,
             timeout=timeout,
             proxies=proxies,
@@ -121,7 +122,7 @@ class BlacksmithClientSettingsBuilder:
         if isinstance(value, type) and issubclass(value, CollectionParser):
             return value  # type: ignore
         cls = resolve_entrypoint(value)
-        return cls
+        return cls  # type: ignore
 
     def build_middlewares(self) -> Iterator[SyncHTTPMiddleware]:
         value = aslist(
@@ -213,19 +214,19 @@ class PyramidBlacksmith:
     def __init__(
         self,
         request: Request,
-        clients: Dict[str, SyncClientFactory],
+        clients: Dict[str, SyncClientFactory[Any, Any]],
         middleware_factories: Dict[str, List[AbstractMiddlewareFactoryBuilder]],
     ):
         self.request = request
         self.clients = clients
         self.middleware_factories = middleware_factories
 
-    def __getattr__(self, name: str) -> Callable:
+    def __getattr__(self, name: str) -> Callable[[str], SyncClient[Any, Any]]:
         """
         Return the blacksmith client factory named in the configuration.
         """
 
-        def get_client(client_name):
+        def get_client(client_name: str) -> SyncClient[Any, Any]:
             try:
                 client_factory = self.clients[name]
             except KeyError as k:
@@ -243,7 +244,7 @@ def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], PyramidBlacksmith]:
 
-    settings = config.registry.settings
+    settings: Settings = config.registry.settings
     clients_key = aslist(settings.get("blacksmith.clients", ["client"]))
     clients_dict = {
         key: BlacksmithClientSettingsBuilder(settings, key).build()

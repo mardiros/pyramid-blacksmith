@@ -16,7 +16,7 @@ repository = "https://github.com/mardiros/pyramid-blacksmith"
 version = "0.2.0"
 
 [tool.poetry.dependencies]
-blacksmith = "^0.11.0"
+blacksmith = "^0.12.1"
 prometheus-client = "^0.12.0"
 pyramid = ">1.10, ^2.0"
 python = "^3.7"
@@ -43,6 +43,15 @@ prometheus = ["prometheus-client"]
 
 [tool.pytest.ini_options]
 norecursedirs = "docs"
+
+[tool.pyright]
+include = ["src"]
+ignore = ["examples"]
+typeCheckingMode = "strict"
+reportUnknownMemberType = false
+reportUnknownParameterType = false
+reportUnknownVariableType = false
+reportPrivateUsage = false
 
 [tool.isort]
 profile = "black"
