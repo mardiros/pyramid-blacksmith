@@ -7,7 +7,7 @@ doc:
 cleandoc:
     cd docs && poetry run make clean
 
-test: unittest lint
+test: mypy unittest lint
 
 lf:
     poetry run pytest -sxvvv --lf
@@ -17,6 +17,9 @@ unittest test_suite=default_test_suite:
 
 lint:
     poetry run flake8
+
+mypy:
+    poetry run mypy src/pyramid_blacksmith/
 
 black:
     poetry run isort .

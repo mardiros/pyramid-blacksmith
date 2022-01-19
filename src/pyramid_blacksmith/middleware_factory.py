@@ -3,7 +3,7 @@ import abc
 from typing import Dict
 
 from blacksmith import SyncHTTPAddHeadersMiddleware, SyncHTTPMiddleware
-from pyramid.request import Request
+from pyramid.request import Request  # type: ignore
 
 
 class AbstractMiddlewareFactoryBuilder(abc.ABC):
@@ -25,7 +25,7 @@ class ForwardHeaderFactoryBuilder(AbstractMiddlewareFactoryBuilder):
         self.headers = list(kwargs.keys())
 
     def __call__(self, request: Request) -> SyncHTTPAddHeadersMiddleware:
-        headers = {}
+        headers: Dict[str, str] = {}
         for hdr in self.headers:
             val = request.headers.get(hdr)
             if val:

@@ -1,8 +1,8 @@
-from typing import Type
+from typing import Any, Type
 
 import pkg_resources
-from pyramid.exceptions import ConfigurationError
-from pyramid.settings import aslist
+from pyramid.exceptions import ConfigurationError  # type: ignore
+from pyramid.settings import aslist  # type: ignore
 
 from .typing import Settings
 
@@ -10,7 +10,7 @@ from .typing import Settings
 def list_to_dict(
     settings: Settings,
     setting: str,
-    with_flag=False,
+    with_flag: bool = False,
 ) -> Settings:
     """
     Cast the setting ``setting`` from the settings `settings`.
@@ -43,7 +43,7 @@ def list_to_dict(
     return dict_
 
 
-def resolve_entrypoint(path: str) -> Type:
+def resolve_entrypoint(path: str) -> Type[Any]:
     """
     Resolve a class from the configuration.
 

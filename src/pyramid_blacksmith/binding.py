@@ -1,7 +1,8 @@
-from typing import Callable, Dict, Iterator, List, Optional, Type, cast
+from typing import Any, Callable, Dict, Iterator, List, Optional, Type, cast
 
 import blacksmith
 from blacksmith import (
+    SyncClient,
     SyncClientFactory,
     SyncConsulDiscovery,
     SyncHTTPMiddleware,
@@ -10,14 +11,13 @@ from blacksmith import (
 )
 from blacksmith.domain.model.http import HTTPTimeout
 from blacksmith.domain.model.params import CollectionParser
-from blacksmith.sd._sync.adapters.static import Endpoints
 from blacksmith.sd._sync.base import SyncAbstractServiceDiscovery
 from blacksmith.service._sync.base import SyncAbstractTransport
-from blacksmith.typing import Proxies
-from pyramid.config import Configurator
-from pyramid.exceptions import ConfigurationError
-from pyramid.request import Request
-from pyramid.settings import asbool, aslist
+from blacksmith.typing import Proxies, Service, Url
+from pyramid.config import Configurator   # type: ignore
+from pyramid.exceptions import ConfigurationError  # type: ignore
+from pyramid.request import Request  # type: ignore
+from pyramid.settings import asbool, aslist  # type: ignore
 
 from pyramid_blacksmith.middleware_factory import AbstractMiddlewareFactoryBuilder
 
@@ -30,14 +30,14 @@ class BlacksmithClientSettingsBuilder:
         self.settings = settings
         self.prefix = f"blacksmith.{prefix}"
 
-    def build(self) -> SyncClientFactory:
+    def build(self) -> SyncClientFactory[Any, Any]:
         sd = self.build_sd_strategy()
         timeout = self.get_timeout()
         proxies = self.get_proxies()
         verify = self.get_verify_certificate()
         transport = self.build_transport()
         collection_parser = self.build_collection_parser()
-        ret = SyncClientFactory(
+        ret: SyncClientFactory[Any, Any] = SyncClientFactory(
             sd,
             timeout=timeout,
             proxies=proxies,
@@ -52,16 +52,16 @@ class BlacksmithClientSettingsBuilder:
     def build_sd_static(self) -> SyncStaticDiscovery:
         key = f"{self.prefix}.static_sd_config"
         services_endpoints = list_to_dict(self.settings, key)
-        services: Endpoints = {}
-        for api, url in services_endpoints.items():
-            api, version = api.split("/", 1) if "/" in api else (api, None)
-            services[(api, version)] = url
+        services: Dict[Service, Url] = {}
+        for api_v, url in services_endpoints.items():
+            api, version = api_v.split("/", 1) if "/" in api_v else (api_v, None)
+            services[(api or "", version)] = url
         return SyncStaticDiscovery(services)
 
     def build_sd_consul(self) -> SyncConsulDiscovery:
         key = f"{self.prefix}.consul_sd_config"
         kwargs = list_to_dict(self.settings, key)
-        return SyncConsulDiscovery(**kwargs)
+        return SyncConsulDiscovery(**kwargs)  # type: ignore
 
     def build_sd_router(self) -> SyncRouterDiscovery:
         key = f"{self.prefix}.router_sd_config"
@@ -101,6 +101,7 @@ class BlacksmithClientSettingsBuilder:
         key = f"{self.prefix}.proxies"
         if key in self.settings:
             return cast(Proxies, list_to_dict(self.settings, key)) or None
+        return None
 
     def get_verify_certificate(self) -> bool:
         return asbool(self.settings.get(f"{self.prefix}.verify_certificate", True))
@@ -119,9 +120,9 @@ class BlacksmithClientSettingsBuilder:
         if not value:
             return CollectionParser
         if isinstance(value, type) and issubclass(value, CollectionParser):
-            return value
+            return value  # type: ignore
         cls = resolve_entrypoint(value)
-        return cls
+        return cls  # type: ignore
 
     def build_middlewares(self) -> Iterator[SyncHTTPMiddleware]:
         value = aslist(
@@ -133,7 +134,7 @@ class BlacksmithClientSettingsBuilder:
             "circuitbreaker": "pyramid_blacksmith.middleware:CircuitBreakerBuilder",
             "httpcaching": "pyramid_blacksmith.middleware:HTTPCachingBuilder",
         }
-        middlewares = {}
+        middlewares: Dict[str, SyncHTTPMiddleware] = {}
         for middleware in value:
             try:
                 middleware, cls = middleware.split(maxsplit=1)
@@ -213,19 +214,19 @@ class PyramidBlacksmith:
     def __init__(
         self,
         request: Request,
-        clients: Dict[str, SyncClientFactory],
+        clients: Dict[str, SyncClientFactory[Any, Any]],
         middleware_factories: Dict[str, List[AbstractMiddlewareFactoryBuilder]],
     ):
         self.request = request
         self.clients = clients
         self.middleware_factories = middleware_factories
 
-    def __getattr__(self, name: str) -> Callable:
+    def __getattr__(self, name: str) -> Callable[[str], SyncClient[Any, Any]]:
         """
         Return the blacksmith client factory named in the configuration.
         """
 
-        def get_client(client_name):
+        def get_client(client_name: str) -> SyncClient[Any, Any]:
             try:
                 client_factory = self.clients[name]
             except KeyError as k:
@@ -243,7 +244,7 @@ def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], PyramidBlacksmith]:
 
-    settings = config.registry.settings
+    settings: Settings = config.registry.settings
     clients_key = aslist(settings.get("blacksmith.clients", ["client"]))
     clients_dict = {
         key: BlacksmithClientSettingsBuilder(settings, key).build()
