@@ -1,3 +1,8 @@
+0.3.0  - Released on 2022-01-19
+-------------------------------
+* Add client middlewares for authentication purpose
+* Add typing support (best effort since pyramid is not typed)
+
 0.2.0 (2022-01-13)
 ------------------
 * Add middlewares
