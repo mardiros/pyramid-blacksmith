@@ -10,7 +10,7 @@ from blacksmith.middleware._sync.http_caching import (
 )
 from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.typing import ClientName, Path
-from prometheus_client import CollectorRegistry
+from prometheus_client import CollectorRegistry  # type: ignore
 from purgatory import SyncInMemoryUnitOfWork
 
 from pyramid_blacksmith.middleware import AbstractMiddlewareBuilder

@@ -7,7 +7,7 @@ Blacksmith middleware can be configured using the configurator.
 Loading middlewares
 -------------------
 
-The list of middleware are defined under the 
+The list of middleware are defined under the
 setting key ``blacksmith.client.middlewares``, as in the example above.
 
 .. code-block:: ini
@@ -54,7 +54,7 @@ Circuit Breaker Middleware
 
    # Optional configurations
    blacksmith.client.middleware.circuitbreaker =
-      threshold   7  
+      threshold   7
       ttl         42
 
 The ``threshold`` is the maximum number of consecutive failure to attempt

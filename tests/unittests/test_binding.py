@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from typing import Any, Dict
 
 import pytest
 from blacksmith.domain.model.http import HTTPTimeout
@@ -14,9 +15,10 @@ from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
 from blacksmith.service._sync.adapters.httpx import SyncHttpxTransport
 from blacksmith.service._sync.client import SyncClientFactory
+from prometheus_client import CollectorRegistry  # type: ignore
 from pydantic.typing import NoneType
-from pyramid.exceptions import ConfigurationError
-from pyramid.interfaces import IRequestExtensions
+from pyramid.exceptions import ConfigurationError  # type: ignore
+from pyramid.interfaces import IRequestExtensions  # type: ignore
 
 from pyramid_blacksmith.binding import (
     BlacksmithClientSettingsBuilder,
@@ -46,21 +48,23 @@ from tests.unittests.fixtures import (  # noqa
         }
     ],
 )
-def test_includeme(config):
-    ext = config.registry.queryUtility(IRequestExtensions)
+def test_includeme(config: Dict[str, Any], registry: CollectorRegistry):
+    ext: Any = config.registry.queryUtility(IRequestExtensions)  # type: ignore
     assert "blacksmith" in ext.descriptors
 
     # check that the scan is loading resources
-    assert registry.clients == {
-        "api": {"dummy": registry.clients["api"]["dummy"]},
+    assert blacksmith_registry.clients == {
+        "api": {"dummy": blacksmith_registry.clients["api"]["dummy"]},
     }
-    assert registry.clients["api"]["dummy"].collection is None
-    assert registry.clients["api"]["dummy"].resource.path == "/dummies/{name}"
+    assert blacksmith_registry.clients["api"]["dummy"].collection is None
+    assert (
+        blacksmith_registry.clients["api"]["dummy"].resource.path == "/dummies/{name}"
+    )
 
 
 @pytest.mark.parametrize(
     "params",
-    [
+    [  # type: ignore
         {
             "settings": {
                 "blacksmith.client.service_discovery": "router",
@@ -129,7 +133,9 @@ def test_includeme(config):
         },
     ],
 )
-def test_req_attr(params, dummy_request):
+def test_req_attr(
+    params: Dict[str, Any], dummy_request: Any, registry: CollectorRegistry
+):
     assert isinstance(dummy_request.blacksmith, PyramidBlacksmith)
     assert isinstance(dummy_request.blacksmith.clients["client"], SyncClientFactory)
     assert isinstance(
@@ -191,7 +197,9 @@ def test_req_attr(params, dummy_request):
         }
     ],
 )
-def test_multi_client(params, dummy_request):
+def test_multi_client(
+    params: Dict[str, Any], dummy_request: Any, registry: CollectorRegistry
+):
     assert isinstance(
         dummy_request.blacksmith.clients["client1"].sd, params["expected"]["client1"]
     )

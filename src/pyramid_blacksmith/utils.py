@@ -1,4 +1,4 @@
-from typing import Any, Type
+from typing import Any
 
 import pkg_resources
 from pyramid.exceptions import ConfigurationError  # type: ignore
@@ -43,7 +43,7 @@ def list_to_dict(
     return dict_
 
 
-def resolve_entrypoint(path: str) -> Type[Any]:
+def resolve_entrypoint(path: str) -> Any:
     """
     Resolve a class from the configuration.
 
