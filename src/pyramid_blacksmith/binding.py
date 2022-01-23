@@ -14,7 +14,7 @@ from blacksmith.domain.model.params import CollectionParser
 from blacksmith.sd._sync.base import SyncAbstractServiceDiscovery
 from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.typing import Proxies, Service, Url
-from pyramid.config import Configurator   # type: ignore
+from pyramid.config import Configurator  # type: ignore
 from pyramid.exceptions import ConfigurationError  # type: ignore
 from pyramid.request import Request  # type: ignore
 from pyramid.settings import asbool, aslist  # type: ignore

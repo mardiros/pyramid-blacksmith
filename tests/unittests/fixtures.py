@@ -1,4 +1,5 @@
 from typing import Any, List
+
 from blacksmith.domain.model import HTTPRequest, HTTPResponse, HTTPTimeout
 from blacksmith.domain.model.params import CollectionParser
 from blacksmith.domain.typing import SyncMiddleware
@@ -7,8 +8,8 @@ from blacksmith.middleware._sync.http_caching import (
     AbstractCachingPolicy,
     AbstractSerializer,
 )
-from blacksmith.typing import ClientName, Path
 from blacksmith.service._sync.base import SyncAbstractTransport
+from blacksmith.typing import ClientName, Path
 from prometheus_client import CollectorRegistry
 from purgatory import SyncInMemoryUnitOfWork
 
