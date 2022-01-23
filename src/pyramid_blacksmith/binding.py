@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Type, cast
 
 import blacksmith
 from blacksmith import (
+    PrometheusMetrics,
     SyncClient,
     SyncClientFactory,
     SyncConsulDiscovery,
@@ -25,11 +26,31 @@ from .typing import Settings
 from .utils import list_to_dict, resolve_entrypoint
 
 
-class BlacksmithClientSettingsBuilder:
-    def __init__(self, settings: Settings, prefix: str = "client"):
+class SettingsBuilder:
+    def __init__(
+        self, settings: Settings, metrics: PrometheusMetrics, prefix: str = "client"
+    ):
         self.settings = settings
         self.prefix = f"blacksmith.{prefix}"
+        self.metrics = metrics
 
+
+class BlacksmithPrometheusMetricsBuilder:
+    def __init__(self, settings: Settings):
+        self.settings = settings
+        self.prefix = "blacksmith.prometheus_buckets"
+
+    def build(self) -> PrometheusMetrics:
+        buckets_list = list_to_dict(self.settings, self.prefix)
+        buckets: Dict[str, List[float]] = {}
+        for key, vals in buckets_list.items():
+            buckets[key] = [float(val) for val in vals.split()]
+
+        metrics = PrometheusMetrics(**buckets)
+        return metrics
+
+
+class BlacksmithClientSettingsBuilder(SettingsBuilder):
     def build(self) -> SyncClientFactory[Any, Any]:
         sd = self.build_sd_strategy()
         timeout = self.get_timeout()
@@ -45,7 +66,7 @@ class BlacksmithClientSettingsBuilder:
             transport=transport,
             collection_parser=collection_parser,
         )
-        for mw in self.build_middlewares():
+        for mw in self.build_middlewares(self.metrics):
             ret.add_middleware(mw)
         return ret
 
@@ -124,17 +145,17 @@ class BlacksmithClientSettingsBuilder:
         cls = resolve_entrypoint(value)
         return cls  # type: ignore
 
-    def build_middlewares(self) -> Iterator[SyncHTTPMiddleware]:
+    def build_middlewares(
+        self, metrics: PrometheusMetrics
+    ) -> Iterator[SyncHTTPMiddleware]:
         value = aslist(
             self.settings.get(f"{self.prefix}.middlewares", []), flatten=False
         )
-
         classes = {
             "prometheus": "pyramid_blacksmith.middleware:PrometheusMetricsBuilder",
             "circuitbreaker": "pyramid_blacksmith.middleware:CircuitBreakerBuilder",
-            "httpcaching": "pyramid_blacksmith.middleware:HTTPCachingBuilder",
+            "http_cache": "pyramid_blacksmith.middleware:HTTPCacheBuilder",
         }
-        middlewares: Dict[str, SyncHTTPMiddleware] = {}
         for middleware in value:
             try:
                 middleware, cls = middleware.split(maxsplit=1)
@@ -144,13 +165,12 @@ class BlacksmithClientSettingsBuilder:
             instance = cls(
                 self.settings,
                 f"{self.prefix}.middleware.{middleware}",
-                middlewares,
+                metrics,
             ).build()
             yield instance
-            middlewares[middleware] = instance
 
 
-class BlacksmithMiddlewareFactoryBuilder:
+class BlacksmithMiddlewareFactoryBuilder(SettingsBuilder):
     """
     Parse the settings like:
 
@@ -163,10 +183,6 @@ class BlacksmithMiddlewareFactoryBuilder:
             Authorization
 
     """
-
-    def __init__(self, settings: Settings, prefix: str = "client"):
-        self.settings = settings
-        self.prefix = f"blacksmith.{prefix}"
 
     def build(self) -> Iterator[AbstractMiddlewareFactoryBuilder]:
         classes = {
@@ -246,13 +262,16 @@ def blacksmith_binding_factory(
 
     settings: Settings = config.registry.settings
     clients_key = aslist(settings.get("blacksmith.clients", ["client"]))
+
+    metrics = BlacksmithPrometheusMetricsBuilder(settings).build()
+
     clients_dict = {
-        key: BlacksmithClientSettingsBuilder(settings, key).build()
+        key: BlacksmithClientSettingsBuilder(settings, metrics, key).build()
         for key in clients_key
     }
 
     middleware_factories = {
-        key: list(BlacksmithMiddlewareFactoryBuilder(settings, key).build())
+        key: list(BlacksmithMiddlewareFactoryBuilder(settings, metrics, key).build())
         for key in clients_key
     }
 

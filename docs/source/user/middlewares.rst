@@ -96,15 +96,15 @@ Using redis as a storage backend
       url   redis://host.example.net/42
 
 
-HTTP Caching Middleware
------------------------
+HTTP Cache Middleware
+---------------------
 
 .. code-block:: ini
 
    blacksmith.client.middlewares =
-      httpcaching
+      http_cache
 
-   blacksmith.client.middleware.httpcaching =
+   blacksmith.client.middleware.http_cache =
       redis       redis://foo.localhost/0
 
 
@@ -114,12 +114,12 @@ keys are avaiable:
 
 .. code-block:: ini
 
-    blacksmith.client.middleware.httpcaching =
+    blacksmith.client.middleware.http_cache =
          redis       redis://foo.localhost/0
          policy      path.to.module:SpecificCachePolicy
          serializer  path.to.module:SpecificSerializer
 
-   blacksmith.client.middleware.httpcaching.policy =
+   blacksmith.client.middleware.http_cache.policy =
       key val
       key2 val2
 

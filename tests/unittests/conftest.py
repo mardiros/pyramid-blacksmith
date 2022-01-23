@@ -1,6 +1,7 @@
 from typing import Any, Dict, Generator
 
 import pytest
+from blacksmith import PrometheusMetrics
 from prometheus_client import CollectorRegistry
 from pyramid import testing
 from pyramid.config import Configurator
@@ -34,3 +35,14 @@ def registry() -> Generator[CollectorRegistry, None, None]:
 
     yield prometheus_client.REGISTRY
     prometheus_client.REGISTRY = CollectorRegistry()
+
+
+@pytest.fixture
+def metrics(
+    registry: CollectorRegistry, params: Dict[str, Any]
+) -> Generator[PrometheusMetrics, None, None]:
+    yield PrometheusMetrics(
+        buckets=params.get("metrics", {}).get("buckets"),
+        hit_cache_buckets=params.get("metrics", {}).get("hit_cache_buckets"),
+        registry=registry,
+    )
