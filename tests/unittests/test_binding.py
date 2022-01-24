@@ -1,26 +1,29 @@
 import sys
 from pathlib import Path
+from typing import Any, Dict
 
 import pytest
-from blacksmith.domain.model.http import HTTPTimeout
+from blacksmith import HTTPTimeout, PrometheusMetrics
 from blacksmith.domain.model.params import CollectionParser
-from blacksmith.domain.registry import registry
-from blacksmith.middleware._sync.auth import SyncHTTPBearerAuthorization
+from blacksmith.domain.registry import registry as blacksmith_registry
+from blacksmith.middleware._sync.auth import SyncHTTPBearerMiddleware
 from blacksmith.middleware._sync.base import SyncHTTPAddHeadersMiddleware
-from blacksmith.middleware._sync.circuit_breaker import SyncCircuitBreaker
-from blacksmith.middleware._sync.prometheus import SyncPrometheusMetrics
+from blacksmith.middleware._sync.circuit_breaker import SyncCircuitBreakerMiddleware
+from blacksmith.middleware._sync.prometheus import SyncPrometheusMiddleware
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
 from blacksmith.service._sync.adapters.httpx import SyncHttpxTransport
 from blacksmith.service._sync.client import SyncClientFactory
+from prometheus_client import CollectorRegistry  # type: ignore
 from pydantic.typing import NoneType
-from pyramid.exceptions import ConfigurationError
-from pyramid.interfaces import IRequestExtensions
+from pyramid.exceptions import ConfigurationError  # type: ignore
+from pyramid.interfaces import IRequestExtensions  # type: ignore
 
 from pyramid_blacksmith.binding import (
     BlacksmithClientSettingsBuilder,
     BlacksmithMiddlewareFactoryBuilder,
+    BlacksmithPrometheusMetricsBuilder,
     PyramidBlacksmith,
 )
 from pyramid_blacksmith.middleware_factory import ForwardHeaderFactoryBuilder
@@ -46,21 +49,23 @@ from tests.unittests.fixtures import (  # noqa
         }
     ],
 )
-def test_includeme(config):
-    ext = config.registry.queryUtility(IRequestExtensions)
+def test_includeme(config: Dict[str, Any], registry: CollectorRegistry):
+    ext: Any = config.registry.queryUtility(IRequestExtensions)  # type: ignore
     assert "blacksmith" in ext.descriptors
 
     # check that the scan is loading resources
-    assert registry.clients == {
-        "api": {"dummy": registry.clients["api"]["dummy"]},
+    assert blacksmith_registry.clients == {
+        "api": {"dummy": blacksmith_registry.clients["api"]["dummy"]},
     }
-    assert registry.clients["api"]["dummy"].collection is None
-    assert registry.clients["api"]["dummy"].resource.path == "/dummies/{name}"
+    assert blacksmith_registry.clients["api"]["dummy"].collection is None
+    assert (
+        blacksmith_registry.clients["api"]["dummy"].resource.path == "/dummies/{name}"
+    )
 
 
 @pytest.mark.parametrize(
     "params",
-    [
+    [  # type: ignore
         {
             "settings": {
                 "blacksmith.client.service_discovery": "router",
@@ -77,13 +82,13 @@ def test_includeme(config):
                 "transport": SyncHttpxTransport,
                 "collection_parser": CollectionParser,
                 "middlewares": [
-                    SyncCircuitBreaker,
-                    SyncPrometheusMetrics,
+                    SyncCircuitBreakerMiddleware,
+                    SyncPrometheusMiddleware,
                 ],
                 "middleware_factories": [
                     SyncHTTPAddHeadersMiddleware,
-                    SyncCircuitBreaker,
-                    SyncPrometheusMetrics,
+                    SyncCircuitBreakerMiddleware,
+                    SyncPrometheusMiddleware,
                 ],
             },
         },
@@ -129,7 +134,9 @@ def test_includeme(config):
         },
     ],
 )
-def test_req_attr(params, dummy_request):
+def test_req_attr(
+    params: Dict[str, Any], dummy_request: Any, registry: CollectorRegistry
+):
     assert isinstance(dummy_request.blacksmith, PyramidBlacksmith)
     assert isinstance(dummy_request.blacksmith.clients["client"], SyncClientFactory)
     assert isinstance(
@@ -191,7 +198,9 @@ def test_req_attr(params, dummy_request):
         }
     ],
 )
-def test_multi_client(params, dummy_request):
+def test_multi_client(
+    params: Dict[str, Any], dummy_request: Any, registry: CollectorRegistry
+):
     assert isinstance(
         dummy_request.blacksmith.clients["client1"].sd, params["expected"]["client1"]
     )
@@ -229,8 +238,8 @@ def test_multi_client(params, dummy_request):
         },
     ],
 )
-def test_get_sd_strategy(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_get_sd_strategy(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
     assert isinstance(builder.build_sd_strategy(), params["expected"])
 
 
@@ -250,8 +259,8 @@ def test_get_sd_strategy(params):
         },
     ],
 )
-def test_get_sd_strategy_error(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_get_sd_strategy_error(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
     with pytest.raises(ConfigurationError) as ctx:
         builder.build_sd_strategy()
     assert str(ctx.value) == params["expected"]
@@ -274,8 +283,8 @@ def test_get_sd_strategy_error(params):
         },
     ],
 )
-def test_build_sd_static(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_build_sd_static(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     sd = builder.build_sd_static()
     assert isinstance(sd, SyncStaticDiscovery)
@@ -299,8 +308,8 @@ def test_build_sd_static(params):
         },
     ],
 )
-def test_build_sd_static_error(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_build_sd_static_error(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
     with pytest.raises(ConfigurationError) as ctx:
         builder.build_sd_strategy()
     assert str(ctx.value) == params["expected"]
@@ -344,22 +353,22 @@ def test_build_sd_static_error(params):
         },
     ],
 )
-def test_build_sd_consul(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_build_sd_consul(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     sd = builder.build_sd_consul()
     assert isinstance(sd, SyncConsulDiscovery)
     if "consul_token" in params["expected"]:
-        assert len(sd.blacksmith_cli.middlewares) == 1
+        assert len(sd.blacksmith_cli.middlewares) == 1  # type: ignore
         assert isinstance(
             sd.blacksmith_cli.middlewares[0],
-            SyncHTTPBearerAuthorization,
+            SyncHTTPBearerMiddleware,
         )
         assert sd.blacksmith_cli.middlewares[0].headers == {
             "Authorization": "Bearer abc"
         }
     else:
-        assert len(sd.blacksmith_cli.middlewares) == 0
+        assert len(sd.blacksmith_cli.middlewares) == 0  # type: ignore
 
     assert sd.service_name_fmt == params["expected"]["service_name_fmt"]
     assert sd.service_url_fmt == params["expected"]["service_url_fmt"]
@@ -400,8 +409,8 @@ def test_build_sd_consul(params):
         },
     ],
 )
-def test_build_sd_router(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_build_sd_router(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     sd = builder.build_sd_router()
     assert isinstance(sd, SyncRouterDiscovery)
@@ -437,8 +446,8 @@ def test_build_sd_router(params):
         {"settings": {}, "expected": None},
     ],
 )
-def test_get_proxies(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_get_proxies(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     proxies = builder.get_proxies()
     assert proxies == params["expected"]
@@ -461,8 +470,8 @@ def test_get_proxies(params):
         },
     ],
 )
-def test_get_verify_certificate(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_get_verify_certificate(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     verify = builder.get_verify_certificate()
     assert verify is params["expected"]
@@ -485,8 +494,8 @@ def test_get_verify_certificate(params):
         },
     ],
 )
-def test_build_transport(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_build_transport(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     transport = builder.build_transport()
     assert isinstance(transport, params["expected"])
@@ -514,8 +523,8 @@ def test_build_transport(params):
         },
     ],
 )
-def test_build_collection_parser(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_build_collection_parser(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     parser = builder.build_collection_parser()
     assert parser == params["expected"]
@@ -526,6 +535,68 @@ def test_build_collection_parser(params):
     [
         {
             "settings": {},
+            "expected_request_latency_seconds": [
+                0.05,
+                0.1,
+                0.2,
+                0.4,
+                0.8,
+                1.6,
+                3.2,
+                6.4,
+                12.8,
+                25.6,
+            ],
+            "expected_blacksmith_cache_latency_seconds": [
+                0.005,
+                0.01,
+                0.02,
+                0.04,
+                0.08,
+                0.16,
+                0.32,
+                0.64,
+                1.28,
+                2.56,
+            ],
+        },
+        {
+            "settings": {
+                "blacksmith.prometheus_buckets": """
+                    buckets              0.1  0.2
+                    hit_cache_buckets   0.01 0.02
+                """
+            },
+            "expected_request_latency_seconds": [
+                0.1,
+                0.2,
+            ],
+            "expected_blacksmith_cache_latency_seconds": [
+                0.01,
+                0.02,
+            ],
+        },
+    ],
+)
+def test_metrics_builder(params: Dict[str, Any], registry: CollectorRegistry):
+    builder = BlacksmithPrometheusMetricsBuilder(params["settings"])
+    metric = builder.build()
+    assert (
+        metric.blacksmith_request_latency_seconds._kwargs["buckets"]
+        == params["expected_request_latency_seconds"]
+    )
+
+    assert (
+        metric.blacksmith_cache_latency_seconds._kwargs["buckets"]
+        == params["expected_blacksmith_cache_latency_seconds"]
+    )
+
+
+@pytest.mark.parametrize(
+    "params",
+    [  # type: ignore
+        {
+            "settings": {},
             "expected": [],
         },
         {
@@ -534,7 +605,7 @@ def test_build_collection_parser(params):
                     prometheus
                 """
             },
-            "expected": [SyncPrometheusMetrics],
+            "expected": [SyncPrometheusMiddleware],
         },
         {
             "settings": {
@@ -546,10 +617,10 @@ def test_build_collection_parser(params):
         },
     ],
 )
-def test_build_middlewares(registry, params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_build_middlewares(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
-    middlewares = builder.build_middlewares()
+    middlewares = builder.build_middlewares(metrics)
     assert [type(mw) for mw in middlewares] == params["expected"]
 
 
@@ -567,12 +638,12 @@ def test_build_middlewares(registry, params):
         },
     ],
 )
-def test_build_middlewares_params(params):
-    builder = BlacksmithClientSettingsBuilder(params["settings"])
+def test_build_middlewares_params(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
-    middlewares = builder.build_middlewares()
+    middlewares = builder.build_middlewares(metrics)
     middleware = next(middlewares)
-    assert middleware.tracker == params["expected"]
+    assert middleware.tracker == params["expected"]  # type: ignore
 
 
 @pytest.mark.parametrize(
@@ -589,7 +660,9 @@ def test_build_middlewares_params(params):
         },
     ],
 )
-def test_build_middleware_factory_builder(params):
-    builder = BlacksmithMiddlewareFactoryBuilder(params["settings"])
+def test_build_middleware_factory_builder(
+    params: Dict[str, Any], metrics: PrometheusMetrics
+):
+    builder = BlacksmithMiddlewareFactoryBuilder(params["settings"], metrics)
     factories = [type(f) for f in builder.build()]
     assert factories == params["expected"]

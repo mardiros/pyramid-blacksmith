@@ -1,9 +1,10 @@
 from typing import Any, Dict
+
 import pytest
 from blacksmith import HTTPTimeout
-from blacksmith.typing import ClientName, Path
 from blacksmith.domain.model.http import HTTPRequest, HTTPResponse
-from pyramid.testing import DummyRequest
+from blacksmith.typing import ClientName, Path
+from pyramid.testing import DummyRequest  # type: ignore
 
 from pyramid_blacksmith.middleware_factory import ForwardHeaderFactoryBuilder
 

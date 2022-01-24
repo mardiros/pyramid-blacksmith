@@ -94,7 +94,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "blacksmith"
-version = "0.12.1"
+version = "0.13.0"
 description = "REST API Client designed for microservices"
 category = "main"
 optional = false
@@ -107,7 +107,7 @@ pydantic = ">=1.8.2,<2.0.0"
 typing-extensions = ">=4.0.1,<5.0.0"
 
 [package.extras]
-caching = ["aioredis (>=2.0.0,<3.0.0)"]
+http_cache = ["aioredis (>=2.0.0,<3.0.0)"]
 prometheus = ["prometheus-client (>=0.12.0,<0.13.0)"]
 
 [[package]]
@@ -558,7 +558,7 @@ python-versions = ">=3.5"
 
 [[package]]
 name = "pyparsing"
-version = "3.0.6"
+version = "3.0.7"
 description = "Python parsing module"
 category = "dev"
 optional = false
@@ -983,7 +983,7 @@ prometheus = ["prometheus-client"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "ff0a7bb5a3a27f3744bd28b6070f9f2228ef356ccb5b82631b94827c89a05b55"
+content-hash = "95f1606498c7f950d89adb3463a02ca4dadad97a3a4b1a7301d32a831bb8e901"
 
 [metadata.files]
 alabaster = [
@@ -1015,8 +1015,8 @@ black = [
     {file = "black-21.12b0.tar.gz", hash = "sha256:77b80f693a569e2e527958459634f18df9b0ba2625ba4e0c2d5da5be42e6f2b3"},
 ]
 blacksmith = [
-    {file = "blacksmith-0.12.1-py3-none-any.whl", hash = "sha256:cc5b67373b80b40b6bc570f2ba77e6172be18bf00e1209e269766cb93026f7dc"},
-    {file = "blacksmith-0.12.1.tar.gz", hash = "sha256:37590870326042fcf8be2c8d6248c0cab74f32ac074ff593c93e3c6faa49032c"},
+    {file = "blacksmith-0.13.0-py3-none-any.whl", hash = "sha256:cf2815280d9b197b9ee009582d3e420390b0a3e23f83bef9754886dae9de2340"},
+    {file = "blacksmith-0.13.0.tar.gz", hash = "sha256:91674636d04a320728ec960af332cdf4883defb3d50087d8ad2aad4ec84dc322"},
 ]
 certifi = [
     {file = "certifi-2021.10.8-py2.py3-none-any.whl", hash = "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569"},
@@ -1321,8 +1321,8 @@ pygments = [
     {file = "Pygments-2.11.2.tar.gz", hash = "sha256:4e426f72023d88d03b2fa258de560726ce890ff3b630f88c21cbb8b2503b8c6a"},
 ]
 pyparsing = [
-    {file = "pyparsing-3.0.6-py3-none-any.whl", hash = "sha256:04ff808a5b90911829c55c4e26f75fa5ca8a2f5f36aa3a51f68e27033341d3e4"},
-    {file = "pyparsing-3.0.6.tar.gz", hash = "sha256:d9bdec0013ef1eb5a84ab39a3b3868911598afa494f5faa038647101504e2b81"},
+    {file = "pyparsing-3.0.7-py3-none-any.whl", hash = "sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484"},
+    {file = "pyparsing-3.0.7.tar.gz", hash = "sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea"},
 ]
 pyramid = [
     {file = "pyramid-2.0-py3-none-any.whl", hash = "sha256:de7f097fa2fa43bead1f690761e56594d24954ae7dc7cbf69a5d84bb75c5a099"},
