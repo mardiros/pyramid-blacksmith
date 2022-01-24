@@ -36,12 +36,19 @@ Prometheus Middleware
 
 .. code-block:: ini
 
+   # Optional configuration for the buckets
+   blacksmith.prometheus_buckets =
+       buckets            0.05  0.1  0.2  0.4  1.6  3.2  6.4  12.8  25.6
+       hit_cache_buckets 0.005 0.01 0.02 0.04 0.16 0.32 0.64 0.128 0.256
+
    blacksmith.client.middlewares =
       prometheus
 
-   # Optional configuration for the buckets
-   blacksmith.client.middleware.prometheus =
-       buckets 0.05 0.1 0.2 0.4 1.6 3.2 6.4 12.8 25.6
+.. note::
+
+   The ``hit_cache_buckets`` setting is used by the :ref:`HTTP Cache Middleware`.
+
+   The prometheus middleware alone is only used to track metrics HTTP queries.
 
 
 Circuit Breaker Middleware
@@ -96,6 +103,8 @@ Using redis as a storage backend
       url   redis://host.example.net/42
 
 
+.. _`HTTP Cache Middleware`:
+
 HTTP Cache Middleware
 ---------------------
 
@@ -130,8 +139,6 @@ of blacksmith. The contructor accept parameter ``key`` and ``key2``.
 Note that, to keep the configuration readable, those parameters must be
 of type ``str``.
 
-By default, the ``serializer`` is ``the json module``.
-The key ``serializer`` accept both ``path.to.module`` and
-``path.to.module:SpecificSerializer``.
-The ``AbstractSerializer`` of blacksmith must be implemented.
-
+By default, the ``serializer`` is using ``json``. The key ``serializer``
+``path.to.module:SpecificSerializer``. The ``AbstractSerializer`` of blacksmith
+must be implemented.
