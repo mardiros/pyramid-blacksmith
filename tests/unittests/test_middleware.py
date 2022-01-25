@@ -23,7 +23,7 @@ from tests.unittests.fixtures import (
 
 @pytest.mark.parametrize(
     "params",
-    [],
+    [{}],
 )
 def test_prometheus_metrics_builder(
     metrics: PrometheusMetrics,
