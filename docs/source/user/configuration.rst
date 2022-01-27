@@ -15,7 +15,7 @@ The first setting is used to fillout the blacksmith registry.
 
 .. code-block:: ini
 
-   blacksmith.scan = 
+   blacksmith.scan =
       my.resources
       maybe.another.resources
 
@@ -23,7 +23,7 @@ The first setting is used to fillout the blacksmith registry.
 .. note::
 
    The resources is a list of `packages`_.
-   
+
 .. _`packages`: https://docs.python.org/3/tutorial/modules.html#packages
 
 
@@ -69,7 +69,7 @@ Proxies
 
 .. code-block:: ini
 
-   blacksmith.client.proxies = 
+   blacksmith.client.proxies =
       http://   https://letmeout.example.net:8443/
       https://  https://letmeout.example.net:8443/
 
@@ -94,7 +94,7 @@ Updating the collection parser
 ------------------------------
 
 While consuming API that does not do bared collection, a collection parser
-has to be set in blacksmith to change the `collection_get` method that
+has to be set in blacksmith to change the ``collection_get`` method that
 deserialize and build back the pyrantic model.
 
 .. code-block:: ini
@@ -106,4 +106,10 @@ Middlewares
 -----------
 
 The blacksmith middlewares can also be configured using the configurator,
-this is going to be documented in the next chapter.
+this is going to be documented in the next chapters.
+
+In blacksmith, there are global middlewares per ``ClientFactory``, and
+there are middlewares per ``Client``. Global :ref:`middlewares` are usefull for
+metrics, tracing, caching, but they are not usesull for authentication in
+a multi user application. :ref:`Middleware Factories` are usefull for that
+purpose.

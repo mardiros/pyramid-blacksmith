@@ -1,3 +1,5 @@
+.. _`Middlewares`:
+
 Middlewares
 ===========
 

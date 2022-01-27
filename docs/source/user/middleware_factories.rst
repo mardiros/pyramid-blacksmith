@@ -1,8 +1,10 @@
+.. _`Middleware Factories`:
+
 Middleware Factories
 ====================
 
 The middleware factory differ from the middleware in their need and usage.
-A middleware is global, and, sometimes, middleware data may differ per 
+A middleware is global, and, sometimes, middleware data may differ per
 incoming requests.
 
 The middleware factory, build a middleware and inject in in the blacksmith
@@ -13,7 +15,7 @@ The main use case is for forwardin header
 Forward http headers
 --------------------
 
-The list of middleware are defined under the 
+The list of middleware are defined under the
 setting key ``blacksmith.client.middleware_factories``, as in the example above.
 
 .. code-block:: ini
