@@ -2,6 +2,7 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Type, cast
 
 import blacksmith
 from blacksmith import (
+    CollectionParser,
     PrometheusMetrics,
     SyncClient,
     SyncClientFactory,
@@ -9,11 +10,10 @@ from blacksmith import (
     SyncHTTPMiddleware,
     SyncRouterDiscovery,
     SyncStaticDiscovery,
+    SyncAbstractServiceDiscovery,
+    SyncAbstractTransport,
+    HTTPTimeout,
 )
-from blacksmith.domain.model.http import HTTPTimeout
-from blacksmith.domain.model.params import CollectionParser
-from blacksmith.sd._sync.base import SyncAbstractServiceDiscovery
-from blacksmith.service._sync.base import SyncAbstractTransport
 from blacksmith.typing import Proxies, Service, Url
 from pyramid.config import Configurator  # type: ignore
 from pyramid.exceptions import ConfigurationError  # type: ignore
