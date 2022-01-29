@@ -111,7 +111,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
     def get_timeout(self) -> HTTPTimeout:
         kwargs = {}
         for key in (
-            (f"{self.prefix}.timeout", "timeout"),
+            (f"{self.prefix}.read_timeout", "read"),
             (f"{self.prefix}.connect_timeout", "connect"),
         ):
             if key[0] in self.settings:

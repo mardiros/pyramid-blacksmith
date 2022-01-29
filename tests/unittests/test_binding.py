@@ -96,7 +96,7 @@ def test_includeme(config: Dict[str, Any], registry: CollectorRegistry):
             "settings": {
                 "blacksmith.client.service_discovery": "router",
                 "blacksmith.client.router_sd_config": "",
-                "blacksmith.client.timeout": "5",
+                "blacksmith.client.read_timeout": "5",
                 "blacksmith.client.connect_timeout": "2",
                 "blacksmith.client.proxies": ["http://  http//p/"],
                 "blacksmith.client.verify_certificate": False,

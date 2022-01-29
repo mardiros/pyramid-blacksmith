@@ -94,7 +94,7 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "blacksmith"
-version = "0.13.2"
+version = "0.13.3"
 description = "REST API Client designed for microservices"
 category = "main"
 optional = false
@@ -873,7 +873,7 @@ test = ["pytest", "typing-extensions", "mypy"]
 
 [[package]]
 name = "types-redis"
-version = "4.1.10"
+version = "4.1.11"
 description = "Typing stubs for redis"
 category = "dev"
 optional = false
@@ -983,7 +983,7 @@ prometheus = ["prometheus-client"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "ad5507cd06908440e12616b6097d9e92597ed3ca75931b5662299464897ff111"
+content-hash = "3aee1b3c2ec74c12bef4709043b2353c58ffde2ee2199ddf9bc9e469716cda90"
 
 [metadata.files]
 alabaster = [
@@ -1015,8 +1015,8 @@ black = [
     {file = "black-21.12b0.tar.gz", hash = "sha256:77b80f693a569e2e527958459634f18df9b0ba2625ba4e0c2d5da5be42e6f2b3"},
 ]
 blacksmith = [
-    {file = "blacksmith-0.13.2-py3-none-any.whl", hash = "sha256:ab918bdf39c025ac71e579c0e4938d983ef4f7d9354620a6315f19839e17ba3a"},
-    {file = "blacksmith-0.13.2.tar.gz", hash = "sha256:3d04b83f0d3410eddd267b22783f173e5607ceaddd74253e58931174fb365950"},
+    {file = "blacksmith-0.13.3-py3-none-any.whl", hash = "sha256:2d6cee54e8698e3ae87127c4c1c9a53127bb0509587345d7e8d0e6029b74856c"},
+    {file = "blacksmith-0.13.3.tar.gz", hash = "sha256:aaf982b8033060373c660057d5556e1ad55c17be16fd42f67e06b093da610d30"},
 ]
 certifi = [
     {file = "certifi-2021.10.8-py2.py3-none-any.whl", hash = "sha256:d62a0163eb4c2344ac042ab2bdf75399a71a2d8c7d47eac2e2ee91b9d6339569"},
@@ -1436,8 +1436,8 @@ typeguard = [
     {file = "typeguard-2.13.3.tar.gz", hash = "sha256:00edaa8da3a133674796cf5ea87d9f4b4c367d77476e185e80251cc13dfbb8c4"},
 ]
 types-redis = [
-    {file = "types-redis-4.1.10.tar.gz", hash = "sha256:cd9fe6689442315a453028b38ff2ba11eff7a46f22320335766508e956164dc6"},
-    {file = "types_redis-4.1.10-py3-none-any.whl", hash = "sha256:7b6b5ce5837cdebb9b36efd37a8587204f544956367a51a6cd29b8e62def756e"},
+    {file = "types-redis-4.1.11.tar.gz", hash = "sha256:4f38c2a204343e9c1b8137d78ea1425feb80740a74735ad6318180b8641dcbae"},
+    {file = "types_redis-4.1.11-py3-none-any.whl", hash = "sha256:5b7b9c6af6b517df3614d77dea44082eb57fba10f50de480d7cb744604205cf6"},
 ]
 types-setuptools = [
     {file = "types-setuptools-57.4.7.tar.gz", hash = "sha256:9677d969b00ec1c14552f5be2b2b47a6fbea4d0ed4de0fdcee18abdaa0cc9267"},

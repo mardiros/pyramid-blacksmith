@@ -4,12 +4,11 @@ from typing import Any, Dict
 from blacksmith import (
     PrometheusMetrics,
     SyncCircuitBreakerMiddleware,
+    SyncHTTPMiddleware,
     SyncHTTPCacheMiddleware,
     SyncPrometheusMiddleware,
 )
-from blacksmith.middleware._sync.base import SyncHTTPMiddleware
 from pyramid.exceptions import ConfigurationError  # type: ignore
-
 from pyramid_blacksmith.typing import Settings
 
 from .utils import list_to_dict, resolve_entrypoint

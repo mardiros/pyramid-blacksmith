@@ -60,7 +60,7 @@ Timeout
 
 .. code-block:: ini
 
-   blacksmith.client.timeout = 5
+   blacksmith.client.read_timeout = 5
    blacksmith.client.connect_timeout = 2
 
 
