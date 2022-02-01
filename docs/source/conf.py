@@ -23,16 +23,16 @@ def _get_project_meta():
     with open("../../pyproject.toml") as pyproject:
         file_contents = pyproject.read()
 
-    return tomlkit.parse(file_contents)["tool"]["poetry"]
+    return tomlkit.parse(file_contents)["tool"]["poetry"]  # type: ignore
 
 
 pkg_meta = _get_project_meta()
-project = str(pkg_meta["name"])
-author = str(pkg_meta["authors"][0])
+project = str(pkg_meta["name"])  # type: ignore
+author = str(pkg_meta["authors"][0])  # type: ignore
 copyright = author  # noqa: WPS125
 
 # The short X.Y version
-version = str(pkg_meta["version"])
+version = str(pkg_meta["version"])  # type: ignore
 # The full version, including alpha/beta/rc tags
 release = version
 

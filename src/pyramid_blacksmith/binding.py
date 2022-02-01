@@ -3,16 +3,16 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Type, cast
 import blacksmith
 from blacksmith import (
     CollectionParser,
+    HTTPTimeout,
     PrometheusMetrics,
+    SyncAbstractServiceDiscovery,
+    SyncAbstractTransport,
     SyncClient,
     SyncClientFactory,
     SyncConsulDiscovery,
     SyncHTTPMiddleware,
     SyncRouterDiscovery,
     SyncStaticDiscovery,
-    SyncAbstractServiceDiscovery,
-    SyncAbstractTransport,
-    HTTPTimeout,
 )
 from blacksmith.typing import Proxies, Service, Url
 from pyramid.config import Configurator  # type: ignore
