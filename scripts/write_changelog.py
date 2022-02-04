@@ -4,7 +4,7 @@ import datetime
 import pyramid_blacksmith
 
 header = (
-    f"{pyramid_blacksmith.__version__}  - "
+    f"{pyramid_blacksmith.__version__} - "
     f"Released on {datetime.datetime.now().date().isoformat()}"
 )
 with open("CHANGELOG.rst.new", "w") as changelog:
