@@ -1,3 +1,8 @@
+1.0.0 - Released on 2022-02-12
+------------------------------
+* Update to blacksmith 1.0
+* Rename config "timeout" to "read_timeout"
+
 0.3.0 - Released on 2022-01-19
 -------------------------------
 * Add client middlewares for authentication purpose
