@@ -590,6 +590,7 @@ def test_metrics_builder(params: Dict[str, Any], registry: CollectorRegistry):
         metric.blacksmith_cache_latency_seconds._kwargs["buckets"]
         == params["expected_blacksmith_cache_latency_seconds"]
     )
+    builder.__class__._instance = None  # type: ignore
 
 
 @pytest.mark.parametrize(
