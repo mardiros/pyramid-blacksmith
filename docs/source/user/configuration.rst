@@ -8,6 +8,24 @@ The configuration here will use this format for clarity.
 
 .. _`configurator`: https://docs.pylonsproject.org/projects/pyramid/en/latest/api/config.html#pyramid.config.Configurator
 
+
+Include pyramid_blacksmith as a pyramid plugin
+----------------------------------------------
+
+If you read the Pyramid documentation, there are many way to initialize its Configurator,
+lets go straigth to the point, by loging the plugin using the pyramid depencency injection.
+
+
+.. code-block:: python
+
+   def includeme(config):
+      # Load the blacksmith binding
+      config.include('pyramid_blacksmith')
+
+
+The line above will read the configuration bellow from the `config.registry.settings`.
+
+
 Loading resources
 -----------------
 
@@ -53,6 +71,15 @@ Example using the router
 
 .. literalinclude:: sd/router.ini
    :language: ini
+
+
+.. node::
+
+   This strategy is perfect for testing too.
+   You can use the following section in your test.ini file.
+
+   .. literalinclude:: sd/router-in-test.ini
+      :language: ini
 
 
 Timeout
