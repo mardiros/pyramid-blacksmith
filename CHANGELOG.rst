@@ -1,3 +1,9 @@
+1.0.1 - Released on 2022-10-07
+------------------------------
+* Update dependencies
+  * remove prometheus_client from the dependencies, only dev deps
+* Update to be compatible with Pyramid >1.10
+
 1.0.0 - Released on 2022-02-12
 ------------------------------
 * Update to blacksmith 1.0
