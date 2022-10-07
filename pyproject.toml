@@ -17,24 +17,23 @@ version = "1.0.0"
 
 [tool.poetry.dependencies]
 blacksmith = "^1.0.0"
-prometheus-client = "^0.12.0"
-pyramid = ">1.10, ^2.0"
+pyramid = ">1.10, <3"
 python = "^3.7"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "^4.3.2"
 black = "^22.1.0"
 coverage = {version = "^6.2", extras = ["toml"]}
-esbonio = "^0.8.0"
+esbonio = "^0.14.1"
 flake8 = "^4.0.1"
 isort = "^5.10.1"
-mypy = "^0.931"
-prometheus-client = "^0.12.0"
+mypy = "^0.982"
+prometheus-client = ">0.14"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 redis = "^4.1.0"
 sphinx-rtd-theme = "^1.0.0"
-tomlkit = "^0.8.0"
+tomlkit = "^0.11.5"
 types-redis = "^4.1.8"
 types-setuptools = "^57.4.7"
 

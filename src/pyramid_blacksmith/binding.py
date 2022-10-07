@@ -46,7 +46,7 @@ class BlacksmithPrometheusMetricsBuilder:
         for key, vals in buckets_list.items():
             buckets[key] = [float(val) for val in vals.split()]
 
-        metrics = PrometheusMetrics(**buckets)
+        metrics = PrometheusMetrics(registry=None, **buckets)
         return metrics
 
 
