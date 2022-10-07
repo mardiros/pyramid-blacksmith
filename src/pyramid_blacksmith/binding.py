@@ -1,4 +1,4 @@
-from typing import Any, Callable, Dict, Iterator, List, Optional, Type, cast
+from typing import Any, Callable, ClassVar, Dict, Iterator, List, Optional, Type, cast
 
 import blacksmith
 from blacksmith import (
@@ -36,18 +36,31 @@ class SettingsBuilder:
 
 
 class BlacksmithPrometheusMetricsBuilder:
+    """
+    Create the prometheus metric object from the settings.
+
+    Because the prometheus_client don't want to create multiple time, the same metrics,
+    the build() will return the first PrometheusMetrics created, event if it has been
+    called with different settings.
+
+    This simplify tests, and it is not supposed to be a use case.
+    """
+
+    _instance: ClassVar[Optional[PrometheusMetrics]] = None
+
     def __init__(self, settings: Settings):
         self.settings = settings
         self.prefix = "blacksmith.prometheus_buckets"
 
     def build(self) -> PrometheusMetrics:
-        buckets_list = list_to_dict(self.settings, self.prefix)
-        buckets: Dict[str, List[float]] = {}
-        for key, vals in buckets_list.items():
-            buckets[key] = [float(val) for val in vals.split()]
-
-        metrics = PrometheusMetrics(registry=None, **buckets)
-        return metrics
+        """Return the first PrometheusMetrics object build from the settings passed."""
+        if self.__class__._instance is None:
+            buckets_list = list_to_dict(self.settings, self.prefix)
+            buckets: Dict[str, List[float]] = {}
+            for key, vals in buckets_list.items():
+                buckets[key] = [float(val) for val in vals.split()]
+            self.__class__._instance = PrometheusMetrics(registry=None, **buckets)
+        return self.__class__._instance
 
 
 class BlacksmithClientSettingsBuilder(SettingsBuilder):
@@ -301,7 +314,8 @@ def includeme(config: Configurator):
             ...
 
     """
-    resources = aslist(config.registry.settings.get("blacksmith.scan", []))
+    settings = config.registry.settings  # type: ignore
+    resources = aslist(settings.get("blacksmith.scan", []))
     blacksmith.scan(*resources)
 
     config.add_request_method(
