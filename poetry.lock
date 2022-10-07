@@ -486,7 +486,7 @@ testing = ["pytest", "pytest-benchmark"]
 name = "prometheus-client"
 version = "0.14.1"
 description = "Python client for the Prometheus monitoring system."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 
@@ -1018,12 +1018,12 @@ test = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 
 [extras]
-prometheus = ["prometheus-client"]
+prometheus = []
 
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "5fa7bbe1dc9114d5aa6398e2375341cae3b5a98d0438744d7c33f2c656d413f9"
+content-hash = "74a258ace3b53aa14b8eeb79ca61b986087a90263acf746e3942ee4f3d9c8282"
 
 [metadata.files]
 alabaster = [
