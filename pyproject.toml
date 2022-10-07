@@ -18,6 +18,7 @@ version = "1.0.1"
 [tool.poetry.dependencies]
 blacksmith = "^1.0.0"
 pyramid = ">1.10, <3"
+prometheus-client = ">0.14"
 python = "^3.7"
 
 [tool.poetry.dev-dependencies]
@@ -28,7 +29,6 @@ esbonio = "^0.14.1"
 flake8 = "^4.0.1"
 isort = "^5.10.1"
 mypy = "^0.982"
-prometheus-client = ">0.14"
 pytest = "^6.2.5"
 pytest-cov = "^3.0.0"
 redis = "^4.1.0"
