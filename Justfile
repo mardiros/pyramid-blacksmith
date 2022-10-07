@@ -7,7 +7,7 @@ doc:
 cleandoc:
     cd docs && poetry run make clean
 
-test: mypy unittest lint
+test: lint mypy unittest
 
 lf:
     poetry run pytest -sxvvv --lf
@@ -24,6 +24,8 @@ mypy:
 black:
     poetry run isort .
     poetry run black .
+
+fmt: black
 
 rtd:
     poetry export --dev -f requirements.txt -o docs/requirements.txt --without-hashes
