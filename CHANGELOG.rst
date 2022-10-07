@@ -1,3 +1,9 @@
+1.0.2 - Released on 2022-10-07
+------------------------------
+* Readd previews dependency prometheus_client, always required 
+* Improve developper experience while writing tests due to prometheus_client
+* Update the documentation
+
 1.0.1 - Released on 2022-10-07
 ------------------------------
 * Update dependencies
