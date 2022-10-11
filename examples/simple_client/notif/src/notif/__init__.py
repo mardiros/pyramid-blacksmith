@@ -37,7 +37,7 @@ def post_notif(request):
 
     body = request.json
     api_user = request.blacksmith.client("api_user")
-    user: User = (api_user.users.get({"username": body["username"]})).response
+    user: User = (api_user.users.get({"username": body["username"]})).unwrap()
     send_email(user, body["message"])
     return {"detail": f"{user.email} accepted"}
 
