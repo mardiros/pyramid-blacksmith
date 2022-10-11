@@ -1,5 +1,7 @@
 from typing import Any, List
+from blacksmith import HTTPError
 
+from blacksmith.domain.error import AbstractErrorParser
 from blacksmith.domain.model import HTTPRequest, HTTPResponse, HTTPTimeout
 from blacksmith.domain.model.middleware.http_cache import (
     AbstractCachePolicy,
@@ -29,6 +31,11 @@ class DummyTransport(SyncAbstractTransport):
 
 class DummyCollectionParser(CollectionParser):
     pass
+
+
+class DummyErrorParser(AbstractErrorParser[int]):
+    def __call__(self, error: HTTPError) -> int:
+        return error.status_code
 
 
 class DummyMiddleware(SyncHTTPMiddleware):

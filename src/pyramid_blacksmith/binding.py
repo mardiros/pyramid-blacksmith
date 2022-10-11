@@ -14,6 +14,7 @@ from blacksmith import (
     SyncRouterDiscovery,
     SyncStaticDiscovery,
 )
+from blacksmith.domain.error import AbstractErrorParser, default_error_parser
 from blacksmith.typing import Proxies, Service, Url
 from pyramid.config import Configurator  # type: ignore
 from pyramid.exceptions import ConfigurationError  # type: ignore
@@ -71,6 +72,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
         verify = self.get_verify_certificate()
         transport = self.build_transport()
         collection_parser = self.build_collection_parser()
+        error_parser = self.build_error_parser()
         ret: SyncClientFactory[Any] = SyncClientFactory(
             sd,
             timeout=timeout,
@@ -78,6 +80,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
             verify_certificate=verify,
             transport=transport,
             collection_parser=collection_parser,
+            error_parser=error_parser,
         )
         for mw in self.build_middlewares(self.metrics):
             ret.add_middleware(mw)
@@ -157,6 +160,15 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
             return value  # type: ignore
         cls = resolve_entrypoint(value)
         return cls  # type: ignore
+
+    def build_error_parser(self) -> AbstractErrorParser[Any]:
+        value = self.settings.get(f"{self.prefix}.error_parser")
+        if not value:
+            return default_error_parser
+        if isinstance(value, type):
+            return value  # type: ignore
+        cls = resolve_entrypoint(value)
+        return cls
 
     def build_middlewares(
         self, metrics: PrometheusMetrics
