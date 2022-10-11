@@ -73,7 +73,7 @@ Example using the router
    :language: ini
 
 
-.. node::
+.. note::
 
    This strategy is perfect for testing too.
    You can use the following section in your test.ini file.
