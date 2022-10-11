@@ -1,9 +1,9 @@
-Example using Consul Template
-=============================
+Example for an authenticated user
+=================================
 
 This example is a dummy microservice stack that send email to a user.
 
-This is a copy/paste of the consul_sd service, and we adapt it
+This is a copy/paste of the blacksmith consul_sd service, and we adapt it
 to use a `RouterDiscovery` to get a Server-Side Discovery
 architecture.
 

@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 import pytest
 from blacksmith import HTTPTimeout, PrometheusMetrics
+from blacksmith.domain.error import default_error_parser
 from blacksmith.domain.model.params import CollectionParser
 from blacksmith.domain.registry import registry as blacksmith_registry
 from blacksmith.middleware._sync.auth import SyncHTTPBearerMiddleware
@@ -32,6 +33,7 @@ here = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(here))
 from tests.unittests.fixtures import (  # noqa
     DummyCollectionParser,
+    DummyErrorParser,
     DummyMiddleware,
     DummyTransport,
 )
@@ -59,7 +61,8 @@ def test_includeme(config: Dict[str, Any], registry: CollectorRegistry):
     }
     assert blacksmith_registry.clients["api"]["dummy"].collection is None
     assert (
-        blacksmith_registry.clients["api"]["dummy"].resource.path == "/dummies/{name}"
+        blacksmith_registry.clients["api"]["dummy"].resource.path  # type: ignore
+        == "/dummies/{name}"
     )
 
 
@@ -527,6 +530,35 @@ def test_build_collection_parser(params: Dict[str, Any], metrics: PrometheusMetr
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     parser = builder.build_collection_parser()
+    assert parser == params["expected"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"settings": {}, "expected": default_error_parser},
+        {
+            "settings": {"blacksmith.client.error_parser": ""},
+            "expected": default_error_parser,
+        },
+        {
+            "settings": {"blacksmith.client.error_parser": DummyErrorParser},
+            "expected": DummyErrorParser,
+        },
+        {
+            "settings": {
+                "blacksmith.client.error_parser": (
+                    "tests.unittests.fixtures:DummyErrorParser"
+                )
+            },
+            "expected": DummyErrorParser,
+        },
+    ],
+)
+def test_build_error_parser(params: Dict[str, Any], metrics: PrometheusMetrics):
+    builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
+
+    parser = builder.build_error_parser()
     assert parser == params["expected"]
 
 

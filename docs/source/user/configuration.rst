@@ -129,6 +129,18 @@ deserialize and build back the pyrantic model.
    blacksmith.client.collection_parser = path.to.module:MyCollectionParser
 
 
+Updating the error parser
+------------------------------
+
+While consuming API, the unboxed error is by default a HTTPError, to add
+a generic parser for a whole client factory, the path to the error_parser
+can be provided as a setting.
+
+.. code-block:: ini
+
+   blacksmith.client.error_parser = path.to.module:MyErrorParser
+
+
 Middlewares
 -----------
 

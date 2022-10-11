@@ -14,6 +14,7 @@ from blacksmith import (
     SyncRouterDiscovery,
     SyncStaticDiscovery,
 )
+from blacksmith.domain.error import AbstractErrorParser, default_error_parser
 from blacksmith.typing import Proxies, Service, Url
 from pyramid.config import Configurator  # type: ignore
 from pyramid.exceptions import ConfigurationError  # type: ignore
@@ -64,20 +65,22 @@ class BlacksmithPrometheusMetricsBuilder:
 
 
 class BlacksmithClientSettingsBuilder(SettingsBuilder):
-    def build(self) -> SyncClientFactory[Any, Any]:
+    def build(self) -> SyncClientFactory[Any]:
         sd = self.build_sd_strategy()
         timeout = self.get_timeout()
         proxies = self.get_proxies()
         verify = self.get_verify_certificate()
         transport = self.build_transport()
         collection_parser = self.build_collection_parser()
-        ret: SyncClientFactory[Any, Any] = SyncClientFactory(
+        error_parser = self.build_error_parser()
+        ret: SyncClientFactory[Any] = SyncClientFactory(
             sd,
             timeout=timeout,
             proxies=proxies,
             verify_certificate=verify,
             transport=transport,
             collection_parser=collection_parser,
+            error_parser=error_parser,
         )
         for mw in self.build_middlewares(self.metrics):
             ret.add_middleware(mw)
@@ -157,6 +160,15 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
             return value  # type: ignore
         cls = resolve_entrypoint(value)
         return cls  # type: ignore
+
+    def build_error_parser(self) -> AbstractErrorParser[Any]:
+        value = self.settings.get(f"{self.prefix}.error_parser")
+        if not value:
+            return default_error_parser
+        if isinstance(value, type):
+            return value  # type: ignore
+        cls = resolve_entrypoint(value)
+        return cls
 
     def build_middlewares(
         self, metrics: PrometheusMetrics
@@ -243,19 +255,19 @@ class PyramidBlacksmith:
     def __init__(
         self,
         request: Request,
-        clients: Dict[str, SyncClientFactory[Any, Any]],
+        clients: Dict[str, SyncClientFactory[Any]],
         middleware_factories: Dict[str, List[AbstractMiddlewareFactoryBuilder]],
     ):
         self.request = request
         self.clients = clients
         self.middleware_factories = middleware_factories
 
-    def __getattr__(self, name: str) -> Callable[[str], SyncClient[Any, Any]]:
+    def __getattr__(self, name: str) -> Callable[[str], SyncClient[Any]]:
         """
         Return the blacksmith client factory named in the configuration.
         """
 
-        def get_client(client_name: str) -> SyncClient[Any, Any]:
+        def get_client(client_name: str) -> SyncClient[Any]:
             try:
                 client_factory = self.clients[name]
             except KeyError as k:
@@ -273,7 +285,7 @@ def blacksmith_binding_factory(
     config: Configurator,
 ) -> Callable[[Request], PyramidBlacksmith]:
 
-    settings: Settings = config.registry.settings
+    settings: Settings = config.registry.settings  # type: ignore
     clients_key = aslist(settings.get("blacksmith.clients", ["client"]))
 
     metrics = BlacksmithPrometheusMetricsBuilder(settings).build()

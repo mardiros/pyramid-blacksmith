@@ -2,13 +2,21 @@ import email as emaillib
 import smtplib
 from textwrap import dedent
 
+from blacksmith import HTTPError, ResponseBox
+from blacksmith.domain.error import AbstractErrorParser
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 from notif.resources.user import User
 from prometheus_client import CONTENT_TYPE_LATEST, REGISTRY, generate_latest
 from pyramid.config import Configurator
+from pyramid.httpexceptions import HTTPException
 from pyramid.response import Response
 
 smtp_sd = SyncConsulDiscovery()
+
+
+class ForwardPyramidHttpError(AbstractErrorParser[HTTPException]):
+    def __call__(self, error: HTTPError) -> HTTPException:
+        return HTTPException(error.json.get("detail", ""), code=error.status_code)
 
 
 def send_email(user: User, message: str):
@@ -37,8 +45,13 @@ def post_notif(request):
 
     body = request.json
     api_user = request.blacksmith.client("api_user")
-    user: User = (api_user.users.get({"username": body["username"]})).response
-    send_email(user, body["message"])
+    user: ResponseBox[User, HTTPException] = api_user.users.get(
+        {"username": body["username"]}
+    )
+    if user.is_err():
+        raise user.unwrap_err()
+
+    send_email(user.unwrap(), body["message"])
     return {"detail": f"{user.email} accepted"}
 
 
