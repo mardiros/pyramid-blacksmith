@@ -1,3 +1,7 @@
+2.0.0 - Released on 2022-10-11
+------------------------------
+* Update to blacksmith 2.0
+
 1.0.2 - Released on 2022-10-07
 ------------------------------
 * Readd previews dependency prometheus_client, always required 
