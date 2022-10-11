@@ -3,7 +3,7 @@ import json
 import smtplib
 from textwrap import dedent
 
-from blacksmith import HTTPError
+from blacksmith import HTTPError, ResponseBox
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 from notif.resources.user import User
 from prometheus_client import CONTENT_TYPE_LATEST, REGISTRY, generate_latest
@@ -40,7 +40,12 @@ def post_notif(request):
 
     body = request.json
     api_user = request.blacksmith.client("api_user")
-    user: User = (api_user.users.get({"username": body["username"]})).unwrap()
+    user: ResponseBox[User, HTTPError] = api_user.users.get(
+        {"username": body["username"]}
+    )
+    if user.is_err():
+        raise user.unwrap_err()
+
     send_email(user, body["message"])
     return {"detail": f"{user.email} accepted"}
 

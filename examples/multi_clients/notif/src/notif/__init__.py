@@ -2,7 +2,7 @@ import email as emaillib
 import smtplib
 from textwrap import dedent
 
-from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
+from blacksmith import SyncConsulDiscovery
 from notif.resources.user import User
 from pyramid.config import Configurator
 
@@ -68,7 +68,7 @@ def main(global_config, **settings):
 
         config.add_route("notify_v1", "/v1/notification")
         config.add_view(
-            post_notif_using_consul, route_name="notify_v1", renderer="json"
+            post_notif_using_static, route_name="notify_v1", renderer="json"
         )
 
         config.add_route("notify_v2", "/v2/notification")

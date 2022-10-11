@@ -1,4 +1,4 @@
-Example using Consul Template
+Example with multiple clients
 =============================
 
 This example is a dummy microservice stack that send email to a user.
@@ -13,9 +13,20 @@ Call the service
 
 ::
 
+   # Use static
    curl -H "Content-Type: application/json" \
       --data '{"username": "naruto", "message": "Datte Bayo"}' \
       -X POST http://router.localhost/notif-v1/v1/notification
+
+   # Use consul
+   curl -H "Content-Type: application/json" \
+      --data '{"username": "naruto", "message": "Datte Bayo"}' \
+      -X POST http://router.localhost/notif-v1/v2/notification
+
+   # Use router
+   curl -H "Content-Type: application/json" \
+      --data '{"username": "naruto", "message": "Datte Bayo"}' \
+      -X POST http://router.localhost/notif-v1/v3/notification
 
 
 Check result

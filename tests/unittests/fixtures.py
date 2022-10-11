@@ -1,6 +1,6 @@
 from typing import Any, List
-from blacksmith import HTTPError
 
+from blacksmith import HTTPError
 from blacksmith.domain.error import AbstractErrorParser
 from blacksmith.domain.model import HTTPRequest, HTTPResponse, HTTPTimeout
 from blacksmith.domain.model.middleware.http_cache import (
