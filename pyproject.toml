@@ -13,7 +13,7 @@ homepage = "https://github.com/mardiros/pyramid-blacksmith"
 name = "pyramid-blacksmith"
 readme = "README.rst"
 repository = "https://github.com/mardiros/pyramid-blacksmith"
-version = "2.0.0"
+version = "2.0.1"
 
 [tool.poetry.dependencies]
 blacksmith = "^2.0.0"
