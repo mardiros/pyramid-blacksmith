@@ -37,6 +37,9 @@ class DummyErrorParser(AbstractErrorParser[int]):
     def __call__(self, error: HTTPError) -> int:
         return error.status_code
 
+    def __eq__(self, other: Any):
+        return other.__class__ is DummyErrorParser
+
 
 class DummyMiddleware(SyncHTTPMiddleware):
     def __init__(self, tracker: Any = None):

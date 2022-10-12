@@ -166,9 +166,12 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
         if not value:
             return default_error_parser
         if isinstance(value, type):
-            return value  # type: ignore
-        cls = resolve_entrypoint(value)
-        return cls
+            cls = value
+        elif callable(value):
+            cls = lambda: value
+        else:
+            cls = resolve_entrypoint(value)
+        return cls()
 
     def build_middlewares(
         self, metrics: PrometheusMetrics
