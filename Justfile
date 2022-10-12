@@ -1,3 +1,4 @@
+package := 'pyramid_blacksmith'
 default_test_suite := 'tests/unittests'
 
 doc:
@@ -19,7 +20,7 @@ lint:
     poetry run flake8
 
 mypy:
-    poetry run mypy src/pyramid_blacksmith/
+    poetry run mypy src/
 
 black:
     poetry run isort .
@@ -33,7 +34,7 @@ rtd:
 cov test_suite=default_test_suite:
     rm -f .coverage
     rm -rf htmlcov
-    poetry run pytest --cov-report=html --cov=pyramid_blacksmith {{test_suite}}
+    poetry run pytest --cov-report=html --cov={{package}} {{test_suite}}
     xdg-open htmlcov/index.html
 release major_minor_patch: test rtd && changelog
     poetry version {{major_minor_patch}}
