@@ -1,3 +1,7 @@
+2.0.2 - Released on 2022-10-12
+------------------------------
+* fix the error_parser implementation1
+
 2.0.1 - Released on 2022-10-11
 ------------------------------
 * Update to blacksmith 2.0
