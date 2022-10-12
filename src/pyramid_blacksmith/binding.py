@@ -168,7 +168,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
         if isinstance(value, type):
             cls = value
         elif callable(value):
-            cls = lambda: value
+            return value  # early return avoid flake8 and typing issue.
         else:
             cls = resolve_entrypoint(value)
         return cls()
