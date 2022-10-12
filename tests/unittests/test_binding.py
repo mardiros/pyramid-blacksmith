@@ -542,8 +542,16 @@ def test_build_collection_parser(params: Dict[str, Any], metrics: PrometheusMetr
             "expected": default_error_parser,
         },
         {
+            "settings": {"blacksmith.client.error_parser": default_error_parser},
+            "expected": default_error_parser,
+        },
+        {
             "settings": {"blacksmith.client.error_parser": DummyErrorParser},
-            "expected": DummyErrorParser,
+            "expected": DummyErrorParser(),
+        },
+        {
+            "settings": {"blacksmith.client.error_parser": DummyErrorParser()},
+            "expected": DummyErrorParser(),
         },
         {
             "settings": {
@@ -551,7 +559,7 @@ def test_build_collection_parser(params: Dict[str, Any], metrics: PrometheusMetr
                     "tests.unittests.fixtures:DummyErrorParser"
                 )
             },
-            "expected": DummyErrorParser,
+            "expected": DummyErrorParser(),
         },
     ],
 )
