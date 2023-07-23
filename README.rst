@@ -1,9 +1,9 @@
 pyramid-blacksmith
 ==================
 
-.. image:: https://readthedocs.org/projects/pyramid-blacksmith/badge/?version=latest
-   :target: https://pyramid-blacksmith.readthedocs.io/en/latest/?badge=latest
-   :alt: Documentation Status
+.. image:: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/gh-pages.yml/badge.svg
+   :target: https://mardiros.github.io/pyramid-blacksmith/
+   :alt: Documentation
 
 .. image:: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/main.yml/badge.svg
    :target: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/main.yml
@@ -44,7 +44,7 @@ The configuration of the factory is simply made throw the pyramid configurator.
 Go ahead and `get familiar with the documentation`_.
 
 
-.. _`Blacksmith`: https://python-blacksmith.readthedocs.io/en/latest/index.html
-.. _`Blacksmith Factory`: https://python-blacksmith.readthedocs.io/en/latest/user/instanciating_client.html#instanciating-client
-.. _`get familiar with the documentation`: https://pyramid-blacksmith.readthedocs.io/
+.. _`Blacksmith`: https://mardiros.github.io/blacksmith/index.html
+.. _`Blacksmith Factory`: https://mardiros.github.io/blacksmith/user/instanciating_clients.html
+.. _`get familiar with the documentation`: https://mardiros.github.io/blacksmith/index.html
 

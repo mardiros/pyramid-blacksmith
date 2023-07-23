@@ -75,7 +75,7 @@ stay open.
    | Blacksmith circuit breaker is based on `purgatory`.
    | Read the `purgatory`_ documentation for more information.
 
-.. _`purgatory`: https://purgatory.readthedocs.io/
+.. _`purgatory`: https://mardiros.github.io/purgatory/
 
 
 Collect Circuit Breaker in prometheus
