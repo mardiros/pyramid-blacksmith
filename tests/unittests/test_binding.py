@@ -651,6 +651,14 @@ def test_metrics_builder(params: Dict[str, Any], registry: CollectorRegistry):
         {
             "settings": {
                 "blacksmith.client.middlewares": """
+                    static_headers
+                """
+            },
+            "expected": [SyncHTTPAddHeadersMiddleware],
+        },
+        {
+            "settings": {
+                "blacksmith.client.middlewares": """
                     dummy       tests.unittests.fixtures:DummyMiddlewareBuilder
                 """
             },

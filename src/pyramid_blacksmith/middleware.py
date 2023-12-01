@@ -4,6 +4,7 @@ from typing import Any, Dict
 from blacksmith import (
     PrometheusMetrics,
     SyncCircuitBreakerMiddleware,
+    SyncHTTPAddHeadersMiddleware,
     SyncHTTPCacheMiddleware,
     SyncHTTPMiddleware,
     SyncPrometheusMiddleware,
@@ -74,3 +75,10 @@ class HTTPCacheBuilder(AbstractMiddlewareBuilder):
         kwargs["serializer"] = resolve_entrypoint(srlz_key)  # type: ignore
         kwargs["metrics"] = self.metrics  # type: ignore
         return SyncHTTPCacheMiddleware(**kwargs)  # type: ignore
+
+
+class HTTPStaticHeadersBuilder(AbstractMiddlewareBuilder):
+    def build(self) -> SyncHTTPAddHeadersMiddleware:
+        settings = list_to_dict(self.settings, self.prefix)
+        headers = {key.rstrip(":"): val for key, val in settings.items()}
+        return SyncHTTPAddHeadersMiddleware(headers)
