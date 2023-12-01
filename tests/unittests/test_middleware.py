@@ -11,6 +11,7 @@ from pyramid.config import ConfigurationError  # type: ignore
 
 from pyramid_blacksmith.middleware import (
     CircuitBreakerBuilder,
+    HTTPAddHeadersBuilder,
     HTTPCacheBuilder,
     PrometheusMetricsBuilder,
 )
@@ -153,8 +154,28 @@ def test_http_caching_builder(params: Dict[str, Any], metrics: PrometheusMetrics
         },
     ],
 )
-def test_http_caching_builder_error(params: Dict[str, Any]):
-    cachingb = HTTPCacheBuilder(params["settings"], "key", {})
+def test_http_caching_builder_error(params: Dict[str, Any], metrics: PrometheusMetrics):
+    cachingb = HTTPCacheBuilder(params["settings"], "key", metrics)
     with pytest.raises(ConfigurationError) as ctx:
         cachingb.build()
     assert str(ctx.value) == "Missing sub-key redis in setting key"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {
+                "key": """
+                    Authorization: Bearer abcdef
+                    User-Agent: blacksmith
+                """,
+            },
+            "headers": {"Authorization": "Bearer abcdef", "User-Agent": "blacksmith"},
+        },
+    ],
+)
+def test_http_add_headers(params: Dict[str, Any], metrics: PrometheusMetrics):
+    headersb = HTTPAddHeadersBuilder(params["settings"], "key", metrics)
+    headers = headersb.build()
+    assert headers.headers == params["headers"]
