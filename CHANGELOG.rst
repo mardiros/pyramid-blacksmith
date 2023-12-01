@@ -1,6 +1,10 @@
+2.1.0 - Released on 2023-12-01
+------------------------------
+* Add a middleware to inject a header statically from the conf
+
 2.0.2 - Released on 2022-10-12
 ------------------------------
-* fix the error_parser implementation1
+* Fix the error_parser implementation1
 
 2.0.1 - Released on 2022-10-11
 ------------------------------
@@ -8,11 +12,11 @@
 
 2.0.0 - Released on 2022-10-11
 ------------------------------
-* Broken release :/ 
+* Broken release :/
 
 1.0.2 - Released on 2022-10-07
 ------------------------------
-* Readd previews dependency prometheus_client, always required 
+* Readd previews dependency prometheus_client, always required
 * Improve developper experience while writing tests due to prometheus_client
 * Update the documentation
 
