@@ -144,3 +144,19 @@ of type ``str``.
 By default, the ``serializer`` is using ``json``. The key ``serializer``
 ``path.to.module:SpecificSerializer``. The ``AbstractSerializer`` of blacksmith
 must be implemented.
+
+
+HTTP Static Headers Middleware
+------------------------------
+
+Inject a header in every requests the client is consuming.
+This may be userfull for a client that consume an api using an apikey
+
+.. code-block:: ini
+
+   blacksmith.client.middlewares =
+      static_headers
+
+   blacksmith.client.middleware.static_headers =
+      Authorization: Apikey xyz
+      My-Customer-Header: whatever
