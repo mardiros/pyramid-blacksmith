@@ -11,7 +11,7 @@ from pyramid.config import ConfigurationError  # type: ignore
 
 from pyramid_blacksmith.middleware import (
     CircuitBreakerBuilder,
-    HTTPAddHeadersBuilder,
+    HTTPStaticHeadersBuilder,
     HTTPCacheBuilder,
     PrometheusMetricsBuilder,
 )
@@ -176,6 +176,6 @@ def test_http_caching_builder_error(params: Dict[str, Any], metrics: PrometheusM
     ],
 )
 def test_http_add_headers(params: Dict[str, Any], metrics: PrometheusMetrics):
-    headersb = HTTPAddHeadersBuilder(params["settings"], "key", metrics)
+    headersb = HTTPStaticHeadersBuilder(params["settings"], "key", metrics)
     headers = headersb.build()
     assert headers.headers == params["headers"]

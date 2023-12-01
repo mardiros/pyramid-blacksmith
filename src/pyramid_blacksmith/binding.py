@@ -183,6 +183,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
             "prometheus": "pyramid_blacksmith.middleware:PrometheusMetricsBuilder",
             "circuitbreaker": "pyramid_blacksmith.middleware:CircuitBreakerBuilder",
             "http_cache": "pyramid_blacksmith.middleware:HTTPCacheBuilder",
+            "static_headers": "pyramid_blacksmith.middleware:HTTPStaticHeadersBuilder",
         }
         for middleware in value:
             try:

@@ -77,7 +77,7 @@ class HTTPCacheBuilder(AbstractMiddlewareBuilder):
         return SyncHTTPCacheMiddleware(**kwargs)  # type: ignore
 
 
-class HTTPAddHeadersBuilder(AbstractMiddlewareBuilder):
+class HTTPStaticHeadersBuilder(AbstractMiddlewareBuilder):
     def build(self) -> SyncHTTPAddHeadersMiddleware:
         settings = list_to_dict(self.settings, self.prefix)
         headers = {key.rstrip(":"): val for key, val in settings.items()}
