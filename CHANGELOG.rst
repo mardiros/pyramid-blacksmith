@@ -1,3 +1,9 @@
+2.2.0 - Released on 2024-04-19
+------------------------------
+* Release an alpha middleware for zipkin based on zk
+  Stay undocumented until it has been tested on prod
+* Update deps
+
 2.1.0 - Released on 2023-12-01
 ------------------------------
 * Add a middleware to inject a header statically from the conf
