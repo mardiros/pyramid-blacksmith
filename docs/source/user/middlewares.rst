@@ -40,8 +40,8 @@ Prometheus Middleware
 
    # Optional configuration for the buckets
    blacksmith.prometheus_buckets =
-       buckets            0.05  0.1  0.2  0.4  1.6  3.2  6.4  12.8  25.6
-       hit_cache_buckets 0.005 0.01 0.02 0.04 0.16 0.32 0.64 0.128 0.256
+       buckets            0.05  0.1  0.2  0.4  1.6  3.2  6.4 12.8 25.6
+       hit_cache_buckets 0.005 0.01 0.02 0.04 0.16 0.32 0.64 1.28 2.56
 
    blacksmith.client.middlewares =
       prometheus
