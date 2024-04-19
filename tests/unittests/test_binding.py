@@ -18,7 +18,6 @@ from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
 from blacksmith.service._sync.adapters.httpx import SyncHttpxTransport
 from blacksmith.service._sync.client import SyncClientFactory
 from prometheus_client import CollectorRegistry  # type: ignore
-from pydantic.typing import NoneType
 from pyramid.exceptions import ConfigurationError  # type: ignore
 from pyramid.interfaces import IRequestExtensions  # type: ignore
 
@@ -479,6 +478,9 @@ def test_get_verify_certificate(params: Dict[str, Any], metrics: PrometheusMetri
 
     verify = builder.get_verify_certificate()
     assert verify is params["expected"]
+
+
+NoneType = type(None)
 
 
 @pytest.mark.parametrize(
