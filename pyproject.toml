@@ -20,11 +20,15 @@ blacksmith = "^2.0.0"
 pyramid = ">1.10, <3"
 prometheus-client = ">0.14"
 python = "^3.7"
-zk = {version = "^0.8.5", extras = ["zipkin"]}
+zk = { version = "^0.8.5", extras = ["zipkin"] }
 
-[tool.poetry.dev-dependencies]
+
+[tool.poetry.extras]
+prometheus = ["prometheus-client"]
+
+[tool.poetry.group.dev.dependencies]
 black = "^22.1.0"
-coverage = {version = "^6.2", extras = ["toml"]}
+coverage = { version = "^6.2", extras = ["toml"] }
 esbonio = "^0.14.1"
 flake8 = "^4.0.1"
 furo = "^2022"
@@ -38,11 +42,6 @@ sphinx-autodoc-typehints = "^1.12.0"
 tomlkit = "^0.11.5"
 types-redis = "^4.1.8"
 types-setuptools = "^57.4.7"
-
-[tool.poetry.extras]
-prometheus = ["prometheus-client"]
-
-[tool.poetry.group.dev.dependencies]
 zk = "^0.8.5"
 
 [tool.pytest.ini_options]
