@@ -6,14 +6,16 @@ from blacksmith import SyncPrometheusMiddleware
 from blacksmith.domain.model.middleware.circuit_breaker import PrometheusHook
 from blacksmith.domain.model.middleware.http_cache import CacheControlPolicy
 from blacksmith.domain.model.middleware.prometheus import PrometheusMetrics
+from blacksmith.middleware._sync.zipkin import SyncZipkinMiddleware
 from purgatory import SyncInMemoryUnitOfWork
 from pyramid.config import ConfigurationError  # type: ignore
 
 from pyramid_blacksmith.middleware import (
     CircuitBreakerBuilder,
-    HTTPStaticHeadersBuilder,
     HTTPCacheBuilder,
+    HTTPStaticHeadersBuilder,
     PrometheusMetricsBuilder,
+    ZipkinBuilder,
 )
 from tests.unittests.fixtures import (
     DummyCachePolicy,
@@ -179,3 +181,18 @@ def test_http_add_headers(params: Dict[str, Any], metrics: PrometheusMetrics):
     headersb = HTTPStaticHeadersBuilder(params["settings"], "key", metrics)
     headers = headersb.build()
     assert headers.headers == params["headers"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "settings": {},
+            "headers": {"Authorization": "Bearer abcdef", "User-Agent": "blacksmith"},
+        },
+    ],
+)
+def test_zipkin_middleware(params: Dict[str, Any], metrics: PrometheusMetrics):
+    zkb = ZipkinBuilder(params["settings"], "key", metrics)
+    zkb = zkb.build()
+    assert isinstance(zkb, SyncZipkinMiddleware)
