@@ -16,10 +16,10 @@ repository = "https://github.com/mardiros/pyramid-blacksmith"
 version = "2.2.0"
 
 [tool.poetry.dependencies]
-blacksmith = "^2.7.2"
+python = "^3.8.1"
+blacksmith = "^3.0.0"
 pyramid = ">1.10, <3"
-prometheus-client = ">0.14"
-python = "^3.7"
+prometheus-client = ">0.7"
 zk = { version = "^0.8.5", extras = ["zipkin"] }
 
 
