@@ -1,14 +1,10 @@
-import pkg_resources
-
-try:
-    __version__ = pkg_resources.get_distribution("pyramid-blacksmith").version
-except pkg_resources.DistributionNotFound:
-    # read the doc does not support poetry
-    pass
+from importlib import metadata
 
 from .binding import PyramidBlacksmith, includeme
 from .middleware import AbstractMiddlewareBuilder
 from .middleware_factory import AbstractMiddlewareFactoryBuilder
+
+__version__ = metadata.version("blacksmith")
 
 __all__ = [
     "PyramidBlacksmith",

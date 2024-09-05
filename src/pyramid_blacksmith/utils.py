@@ -1,6 +1,6 @@
+import importlib
 from typing import Any
 
-import pkg_resources
 from pyramid.exceptions import ConfigurationError  # type: ignore
 from pyramid.settings import aslist  # type: ignore
 
@@ -49,5 +49,6 @@ def resolve_entrypoint(path: str) -> Any:
 
     string ``path.to:Class`` will return the type ``Class``.
     """
-    ep = pkg_resources.EntryPoint.parse(f"x={path}")
-    return ep.resolve()
+    module_name, _, attr = path.partition(":")
+    module = importlib.import_module(module_name)
+    return getattr(module, attr) if attr else module
