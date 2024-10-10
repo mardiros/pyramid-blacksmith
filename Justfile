@@ -1,6 +1,9 @@
 package := 'pyramid_blacksmith'
 default_test_suite := 'tests/unittests'
 
+install:
+    poetry install --with dev
+
 doc:
     cd docs && poetry run make html
     xdg-open docs/build/html/index.html
