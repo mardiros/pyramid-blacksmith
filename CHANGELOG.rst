@@ -1,3 +1,7 @@
+3.1.0 - Released on 2024-10-10
+------------------------------
+* Update deps
+
 3.1.0 - Released on 2024-09-05
 ------------------------------
 * Drop python 3.7 support, add support to python 3.12

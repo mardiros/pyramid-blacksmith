@@ -39,7 +39,7 @@ cov test_suite=default_test_suite:
     rm -rf htmlcov
     poetry run pytest --cov-report=html --cov={{package}} {{test_suite}}
     xdg-open htmlcov/index.html
-release major_minor_patch: test gh-pages && changelog
+release major_minor_patch: test && changelog
     poetry version {{major_minor_patch}}
     poetry install
 
