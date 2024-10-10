@@ -11,6 +11,7 @@ from blacksmith import (
     SyncClientFactory,
     SyncConsulDiscovery,
     SyncHTTPMiddleware,
+    SyncNomadDiscovery,
     SyncRouterDiscovery,
     SyncStaticDiscovery,
 )
@@ -100,6 +101,11 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
         kwargs = list_to_dict(self.settings, key)
         return SyncConsulDiscovery(**kwargs)  # type: ignore
 
+    def build_sd_nomad(self) -> SyncNomadDiscovery:
+        key = f"{self.prefix}.nomad_sd_config"
+        kwargs = list_to_dict(self.settings, key)
+        return SyncNomadDiscovery(**kwargs)  # type: ignore
+
     def build_sd_router(self) -> SyncRouterDiscovery:
         key = f"{self.prefix}.router_sd_config"
         kwargs = list_to_dict(self.settings, key)
@@ -109,6 +115,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
         sd_classes: Dict[str, Callable[[], SyncAbstractServiceDiscovery]] = {
             "static": self.build_sd_static,
             "consul": self.build_sd_consul,
+            "nomad": self.build_sd_nomad,
             "router": self.build_sd_router,
         }
         key = f"{self.prefix}.service_discovery"
