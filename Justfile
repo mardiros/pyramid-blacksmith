@@ -32,7 +32,7 @@ black:
 fmt: black
 
 gh-pages:
-    poetry export --dev -f requirements.txt -o docs/requirements.txt --without-hashes
+    poetry export --with doc -f requirements.txt -o docs/requirements.txt --without-hashes
 
 cov test_suite=default_test_suite:
     rm -f .coverage
