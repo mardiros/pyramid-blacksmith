@@ -1,3 +1,7 @@
+3.3.0 - Released on 2024-10-10
+------------------------------
+* Add support of the Nomad Service discovery
+
 3.2.0 - Released on 2024-10-10
 ------------------------------
 * Fix the __version__ property
