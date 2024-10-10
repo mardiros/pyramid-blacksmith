@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict
 
+from blacksmith.sd._sync.adapters.nomad import SyncNomadDiscovery
 import pytest
 from blacksmith import HTTPTimeout, PrometheusMetrics
 from blacksmith.domain.error import default_error_parser
@@ -239,6 +240,13 @@ def test_multi_client(
             },
             "expected": SyncRouterDiscovery,
         },
+        {
+            "settings": {
+                "blacksmith.client.service_discovery": "nomad",
+                "blacksmith.client.nomad_sd_config": [],
+            },
+            "expected": SyncNomadDiscovery,
+        },
     ],
 )
 def test_get_sd_strategy(params: Dict[str, Any], metrics: PrometheusMetrics):
@@ -257,7 +265,7 @@ def test_get_sd_strategy(params: Dict[str, Any], metrics: PrometheusMetrics):
             "settings": {"blacksmith.client.service_discovery": "Static"},
             "expected": (
                 "Invalid value Static for blacksmith.client.service_discovery: "
-                "not in static, consul, router"
+                "not in static, consul, nomad, router"
             ),
         },
     ],
