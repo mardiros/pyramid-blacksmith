@@ -1,3 +1,7 @@
+3.2.0 - Released on 2024-10-10
+------------------------------
+* Fix the __version__ property
+
 3.0.1 - Released on 2024-10-10
 ------------------------------
 * Update deps
