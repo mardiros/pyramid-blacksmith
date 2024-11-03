@@ -283,7 +283,7 @@ class PyramidBlacksmith:
             try:
                 client_factory = self.clients[name]
             except KeyError as k:
-                raise AttributeError(f"Client {k} is not registered")
+                raise AttributeError(f"Client {k} is not registered") from k
 
             cli = client_factory(client_name)
             for middleware_factory in self.middleware_factories.get(name, []):
