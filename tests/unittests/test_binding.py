@@ -1,5 +1,3 @@
-import sys
-from pathlib import Path
 from typing import Any, Dict
 
 import pytest
@@ -29,10 +27,7 @@ from pyramid_blacksmith.binding import (
     PyramidBlacksmith,
 )
 from pyramid_blacksmith.middleware_factory import ForwardHeaderFactoryBuilder
-
-here = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(here))
-from tests.unittests.fixtures import (  # noqa
+from tests.unittests.fixtures import (
     DummyCollectionParser,
     DummyErrorParser,
     DummyMiddleware,

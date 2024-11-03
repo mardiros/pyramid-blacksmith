@@ -8,7 +8,8 @@ from blacksmith.domain.model.middleware.http_cache import CacheControlPolicy
 from blacksmith.domain.model.middleware.prometheus import PrometheusMetrics
 from blacksmith.middleware._sync.zipkin import SyncZipkinMiddleware
 from purgatory import SyncInMemoryUnitOfWork
-from pyramid.config import ConfigurationError  # type: ignore
+from pyramid.config import ConfigurationError
+from redis import Redis  # type: ignore
 
 from pyramid_blacksmith.middleware import (
     CircuitBreakerBuilder,
@@ -133,7 +134,10 @@ def test_circuit_breaker(params: Dict[str, Any], metrics: PrometheusMetrics):
 def test_http_caching_builder(params: Dict[str, Any], metrics: PrometheusMetrics):
     cachingb = HTTPCacheBuilder(params["settings"], "key", metrics)
     caching = cachingb.build()
-    assert caching._cache.connection_pool.connection_kwargs == params["expected_redis"]
+    assert (
+        cast(Redis, caching._cache).connection_pool.connection_kwargs
+        == params["expected_redis"]
+    )
     assert isinstance(caching._policy, params["expected_policy"])
     assert caching._serializer is params["expected_serializer"]
     assert (
@@ -194,5 +198,5 @@ def test_http_add_headers(params: Dict[str, Any], metrics: PrometheusMetrics):
 )
 def test_zipkin_middleware(params: Dict[str, Any], metrics: PrometheusMetrics):
     zkb = ZipkinBuilder(params["settings"], "key", metrics)
-    zkb = zkb.build()
-    assert isinstance(zkb, SyncZipkinMiddleware)
+    zkm = zkb.build()
+    assert isinstance(zkm, SyncZipkinMiddleware)

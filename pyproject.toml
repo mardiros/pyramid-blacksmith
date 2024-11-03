@@ -65,6 +65,15 @@ reportUnknownParameterType = false
 reportUnknownVariableType = false
 typeCheckingMode = "strict"
 
+[[tool.mypy.overrides]]
+disallow_any_generics = true
+disallow_untyped_defs = true
+module = "blacksmith.*"
+
+[[tool.mypy.overrides]]
+module = ["prometheus_client", "pyramid.*", "venusian"]
+ignore_missing_imports = true
+
 [tool.ruff]
 line-length = 88
 target-version = "py39"
