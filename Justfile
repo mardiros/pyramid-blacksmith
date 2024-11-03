@@ -29,9 +29,6 @@ fmt:
     uv run ruff check --fix .
     uv run ruff format src tests
 
-gh-pages:
-    poetry export --with doc -f requirements.txt -o docs/requirements.txt --without-hashes
-
 cov test_suite=default_test_suite:
     rm -f .coverage
     rm -rf htmlcov
