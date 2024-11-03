@@ -16,9 +16,9 @@ from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
 from blacksmith.service._sync.adapters.httpx import SyncHttpxTransport
 from blacksmith.service._sync.client import SyncClientFactory
-from prometheus_client import CollectorRegistry  # type: ignore
-from pyramid.exceptions import ConfigurationError  # type: ignore
-from pyramid.interfaces import IRequestExtensions  # type: ignore
+from prometheus_client import CollectorRegistry
+from pyramid.exceptions import ConfigurationError
+from pyramid.interfaces import IRequestExtensions
 
 from pyramid_blacksmith.binding import (
     BlacksmithClientSettingsBuilder,

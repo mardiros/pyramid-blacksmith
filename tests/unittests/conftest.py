@@ -32,7 +32,7 @@ def dummy_request(config: Configurator) -> Generator[DummyRequest, None, None]:
 
 @pytest.fixture
 def registry() -> Generator[CollectorRegistry, None, None]:
-    import prometheus_client  # type: ignore
+    import prometheus_client
 
     yield prometheus_client.REGISTRY
     prometheus_client.REGISTRY = CollectorRegistry()

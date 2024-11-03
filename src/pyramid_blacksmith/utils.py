@@ -1,8 +1,8 @@
 import importlib
 from typing import Any
 
-from pyramid.exceptions import ConfigurationError  # type: ignore
-from pyramid.settings import aslist  # type: ignore
+from pyramid.exceptions import ConfigurationError
+from pyramid.settings import aslist
 
 from .typing import Settings
 

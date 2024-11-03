@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from pyramid.exceptions import ConfigurationError  # type: ignore
+from pyramid.exceptions import ConfigurationError
 
 from pyramid_blacksmith.binding import list_to_dict
 

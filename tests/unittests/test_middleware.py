@@ -9,7 +9,7 @@ from blacksmith.domain.model.middleware.prometheus import PrometheusMetrics
 from blacksmith.middleware._sync.zipkin import SyncZipkinMiddleware
 from purgatory import SyncInMemoryUnitOfWork
 from pyramid.config import ConfigurationError
-from redis import Redis  # type: ignore
+from redis import Redis
 
 from pyramid_blacksmith.middleware import (
     CircuitBreakerBuilder,

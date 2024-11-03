@@ -1,9 +1,9 @@
 from typing import Any, Optional
 
 from blacksmith import AbstractTraceContext
-from zipkin import api  # type: ignore
-from zipkin.models import Annotation  # type: ignore
-from zipkin.util import hex_str  # type: ignore
+from zipkin import api
+from zipkin.models import Annotation
+from zipkin.util import hex_str
 
 
 class TraceContext(AbstractTraceContext):

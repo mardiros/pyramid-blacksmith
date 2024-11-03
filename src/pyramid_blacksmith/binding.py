@@ -18,10 +18,10 @@ from blacksmith import (
 )
 from blacksmith.domain.error import AbstractErrorParser, default_error_parser
 from blacksmith.typing import Proxies, Service, Url
-from pyramid.config import Configurator  # type: ignore
-from pyramid.exceptions import ConfigurationError  # type: ignore
-from pyramid.request import Request  # type: ignore
-from pyramid.settings import asbool, aslist  # type: ignore
+from pyramid.config import Configurator
+from pyramid.exceptions import ConfigurationError
+from pyramid.request import Request
+from pyramid.settings import asbool, aslist
 
 from pyramid_blacksmith.middleware_factory import AbstractMiddlewareFactoryBuilder
 

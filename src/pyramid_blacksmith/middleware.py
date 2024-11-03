@@ -10,7 +10,7 @@ from blacksmith import (
     SyncPrometheusMiddleware,
 )
 from blacksmith.middleware._sync.zipkin import SyncZipkinMiddleware
-from pyramid.exceptions import ConfigurationError  # type: ignore
+from pyramid.exceptions import ConfigurationError
 
 from pyramid_blacksmith.typing import Settings
 
