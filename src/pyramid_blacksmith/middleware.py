@@ -57,7 +57,7 @@ class CircuitBreakerBuilder(AbstractMiddlewareBuilder):
 
 class HTTPCacheBuilder(AbstractMiddlewareBuilder):
     def build(self) -> SyncHTTPCacheMiddleware:
-        import redis  # noqa
+        import redis
 
         settings = list_to_dict(self.settings, self.prefix)
         kwargs = {}

@@ -74,7 +74,7 @@ def test_circuit_breaker(params: dict[str, Any], metrics: PrometheusMetrics):
     assert circuit.circuit_breaker.default_ttl == params["expected_ttl"]
     assert len(circuit.circuit_breaker.listeners) == 1  # type: ignore
     assert isinstance(
-        list(circuit.circuit_breaker.listeners.keys())[0],  # type: ignore
+        next(iter(circuit.circuit_breaker.listeners.keys())),  # type: ignore
         PrometheusHook,
     )
     assert isinstance(circuit.circuit_breaker.uow, params["expected_uow"])
