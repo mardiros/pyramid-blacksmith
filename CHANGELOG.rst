@@ -1,3 +1,11 @@
+4.0.0 - Released on 2024-11-03
+------------------------------
+* Binding for blacksmith 4.
+* Drop support of python 3.8
+* Use uv / pdm instead of poetry
+* Replace black, flake8 and isort by ruff
+* Update the CI
+
 3.3.0 - Released on 2024-10-10
 ------------------------------
 * Add support of the Nomad Service discovery
