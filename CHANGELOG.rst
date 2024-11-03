@@ -1,4 +1,4 @@
-4.0.0 - Released on 2024-11-03
+4.0.1 - Released on 2024-11-03
 ------------------------------
 * Binding for blacksmith 4.
 * Drop support of python 3.8
