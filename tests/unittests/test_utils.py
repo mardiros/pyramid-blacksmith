@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from pyramid.exceptions import ConfigurationError  # type: ignore
@@ -35,7 +35,7 @@ from pyramid_blacksmith.binding import list_to_dict
         },
     ],
 )
-def test_list_to_dict(params: Dict[str, Any]):
+def test_list_to_dict(params: dict[str, Any]):
     dict_ = list_to_dict(params["settings"], "key")
     assert dict_ == params["expected"]
 
@@ -62,7 +62,7 @@ def test_list_to_dict(params: Dict[str, Any]):
         },
     ],
 )
-def test_list_to_dict_with_flag(params: Dict[str, Any]):
+def test_list_to_dict_with_flag(params: dict[str, Any]):
     dict_ = list_to_dict(params["settings"], "key", with_flag=True)
     assert dict_ == params["expected"]
 
@@ -89,7 +89,7 @@ def test_list_to_dict_with_flag(params: Dict[str, Any]):
         },
     ],
 )
-def test_list_to_dict_raise(params: Dict[str, Any]):
+def test_list_to_dict_raise(params: dict[str, Any]):
     with pytest.raises(ConfigurationError) as ctx:
         list_to_dict(params["settings"], "key")
     assert str(ctx.value) == params["expected"]

@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from blacksmith import HTTPTimeout
@@ -70,7 +70,7 @@ def echo_middleware(
     ],
 )
 def test_forward_header_factory_builder(
-    headers: Dict[str, Any], params: Dict[str, Any]
+    headers: dict[str, Any], params: dict[str, Any]
 ):
     facto = ForwardHeaderFactoryBuilder(**headers)
     middleware = facto(params["pyramid_request"])

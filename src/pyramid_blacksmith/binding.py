@@ -1,4 +1,5 @@
-from typing import Any, Callable, ClassVar, Dict, Iterator, List, Optional, Type, cast
+from collections.abc import Iterator
+from typing import Any, Callable, ClassVar, Optional, cast
 
 import blacksmith
 from blacksmith import (
@@ -58,7 +59,7 @@ class BlacksmithPrometheusMetricsBuilder:
         """Return the first PrometheusMetrics object build from the settings passed."""
         if self.__class__._instance is None:
             buckets_list = list_to_dict(self.settings, self.prefix)
-            buckets: Dict[str, List[float]] = {}
+            buckets: dict[str, list[float]] = {}
             for key, vals in buckets_list.items():
                 buckets[key] = [float(val) for val in vals.split()]
             self.__class__._instance = PrometheusMetrics(registry=None, **buckets)
@@ -90,7 +91,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
     def build_sd_static(self) -> SyncStaticDiscovery:
         key = f"{self.prefix}.static_sd_config"
         services_endpoints = list_to_dict(self.settings, key)
-        services: Dict[Service, Url] = {}
+        services: dict[Service, Url] = {}
         for api_v, url in services_endpoints.items():
             api, version = api_v.split("/", 1) if "/" in api_v else (api_v, None)
             services[(api or "", version)] = url
@@ -112,7 +113,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
         return SyncRouterDiscovery(**kwargs)
 
     def build_sd_strategy(self) -> SyncAbstractServiceDiscovery:
-        sd_classes: Dict[str, Callable[[], SyncAbstractServiceDiscovery]] = {
+        sd_classes: dict[str, Callable[[], SyncAbstractServiceDiscovery]] = {
             "static": self.build_sd_static,
             "consul": self.build_sd_consul,
             "nomad": self.build_sd_nomad,
@@ -159,7 +160,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
         cls = resolve_entrypoint(value)
         return cls()
 
-    def build_collection_parser(self) -> Type[CollectionParser]:
+    def build_collection_parser(self) -> type[CollectionParser]:
         value = self.settings.get(f"{self.prefix}.collection_parser")
         if not value:
             return CollectionParser
@@ -267,8 +268,8 @@ class PyramidBlacksmith:
     def __init__(
         self,
         request: Request,
-        clients: Dict[str, SyncClientFactory[Any]],
-        middleware_factories: Dict[str, List[AbstractMiddlewareFactoryBuilder]],
+        clients: dict[str, SyncClientFactory[Any]],
+        middleware_factories: dict[str, list[AbstractMiddlewareFactoryBuilder]],
     ):
         self.request = request
         self.clients = clients

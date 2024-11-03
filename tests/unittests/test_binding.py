@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 from blacksmith import HTTPTimeout, PrometheusMetrics
@@ -47,7 +47,7 @@ from tests.unittests.fixtures import (
         }
     ],
 )
-def test_includeme(config: Dict[str, Any], registry: CollectorRegistry):
+def test_includeme(config: dict[str, Any], registry: CollectorRegistry):
     ext: Any = config.registry.queryUtility(IRequestExtensions)  # type: ignore
     assert "blacksmith" in ext.descriptors
 
@@ -134,7 +134,7 @@ def test_includeme(config: Dict[str, Any], registry: CollectorRegistry):
     ],
 )
 def test_req_attr(
-    params: Dict[str, Any], dummy_request: Any, registry: CollectorRegistry
+    params: dict[str, Any], dummy_request: Any, registry: CollectorRegistry
 ):
     assert isinstance(dummy_request.blacksmith, PyramidBlacksmith)
     assert isinstance(dummy_request.blacksmith.clients["client"], SyncClientFactory)
@@ -198,7 +198,7 @@ def test_req_attr(
     ],
 )
 def test_multi_client(
-    params: Dict[str, Any], dummy_request: Any, registry: CollectorRegistry
+    params: dict[str, Any], dummy_request: Any, registry: CollectorRegistry
 ):
     assert isinstance(
         dummy_request.blacksmith.clients["client1"].sd, params["expected"]["client1"]
@@ -244,7 +244,7 @@ def test_multi_client(
         },
     ],
 )
-def test_get_sd_strategy(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_get_sd_strategy(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
     assert isinstance(builder.build_sd_strategy(), params["expected"])
 
@@ -265,7 +265,7 @@ def test_get_sd_strategy(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_get_sd_strategy_error(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_get_sd_strategy_error(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
     with pytest.raises(ConfigurationError) as ctx:
         builder.build_sd_strategy()
@@ -289,7 +289,7 @@ def test_get_sd_strategy_error(params: Dict[str, Any], metrics: PrometheusMetric
         },
     ],
 )
-def test_build_sd_static(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_build_sd_static(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     sd = builder.build_sd_static()
@@ -314,7 +314,7 @@ def test_build_sd_static(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_build_sd_static_error(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_build_sd_static_error(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
     with pytest.raises(ConfigurationError) as ctx:
         builder.build_sd_strategy()
@@ -359,7 +359,7 @@ def test_build_sd_static_error(params: Dict[str, Any], metrics: PrometheusMetric
         },
     ],
 )
-def test_build_sd_consul(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_build_sd_consul(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     sd = builder.build_sd_consul()
@@ -415,7 +415,7 @@ def test_build_sd_consul(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_build_sd_router(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_build_sd_router(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     sd = builder.build_sd_router()
@@ -452,7 +452,7 @@ def test_build_sd_router(params: Dict[str, Any], metrics: PrometheusMetrics):
         {"settings": {}, "expected": None},
     ],
 )
-def test_get_proxies(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_get_proxies(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     proxies = builder.get_proxies()
@@ -476,7 +476,7 @@ def test_get_proxies(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_get_verify_certificate(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_get_verify_certificate(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     verify = builder.get_verify_certificate()
@@ -503,7 +503,7 @@ NoneType = type(None)
         },
     ],
 )
-def test_build_transport(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_build_transport(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     transport = builder.build_transport()
@@ -532,7 +532,7 @@ def test_build_transport(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_build_collection_parser(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_build_collection_parser(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     parser = builder.build_collection_parser()
@@ -569,7 +569,7 @@ def test_build_collection_parser(params: Dict[str, Any], metrics: PrometheusMetr
         },
     ],
 )
-def test_build_error_parser(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_build_error_parser(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     parser = builder.build_error_parser()
@@ -624,7 +624,7 @@ def test_build_error_parser(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_metrics_builder(params: Dict[str, Any], registry: CollectorRegistry):
+def test_metrics_builder(params: dict[str, Any], registry: CollectorRegistry):
     builder = BlacksmithPrometheusMetricsBuilder(params["settings"])
     metric = builder.build()
     assert (
@@ -680,7 +680,7 @@ def test_metrics_builder(params: Dict[str, Any], registry: CollectorRegistry):
         },
     ],
 )
-def test_build_middlewares(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_build_middlewares(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     middlewares = builder.build_middlewares(metrics)
@@ -701,7 +701,7 @@ def test_build_middlewares(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_build_middlewares_params(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_build_middlewares_params(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = BlacksmithClientSettingsBuilder(params["settings"], metrics)
 
     middlewares = builder.build_middlewares(metrics)
@@ -724,7 +724,7 @@ def test_build_middlewares_params(params: Dict[str, Any], metrics: PrometheusMet
     ],
 )
 def test_build_middleware_factory_builder(
-    params: Dict[str, Any], metrics: PrometheusMetrics
+    params: dict[str, Any], metrics: PrometheusMetrics
 ):
     builder = BlacksmithMiddlewareFactoryBuilder(params["settings"], metrics)
     factories = [type(f) for f in builder.build()]

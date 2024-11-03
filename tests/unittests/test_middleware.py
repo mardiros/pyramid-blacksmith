@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import pytest
 from blacksmith import SyncPrometheusMiddleware
@@ -67,7 +67,7 @@ def test_prometheus_metrics_builder(
         },
     ],
 )
-def test_circuit_breaker(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_circuit_breaker(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = CircuitBreakerBuilder(params["settings"], "key", metrics)
     circuit = builder.build()
     assert circuit.circuit_breaker.default_threshold == params["expected_threshold"]
@@ -131,7 +131,7 @@ def test_circuit_breaker(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_http_caching_builder(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_http_caching_builder(params: dict[str, Any], metrics: PrometheusMetrics):
     cachingb = HTTPCacheBuilder(params["settings"], "key", metrics)
     caching = cachingb.build()
     assert (
@@ -160,7 +160,7 @@ def test_http_caching_builder(params: Dict[str, Any], metrics: PrometheusMetrics
         },
     ],
 )
-def test_http_caching_builder_error(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_http_caching_builder_error(params: dict[str, Any], metrics: PrometheusMetrics):
     cachingb = HTTPCacheBuilder(params["settings"], "key", metrics)
     with pytest.raises(ConfigurationError) as ctx:
         cachingb.build()
@@ -181,7 +181,7 @@ def test_http_caching_builder_error(params: Dict[str, Any], metrics: PrometheusM
         },
     ],
 )
-def test_http_add_headers(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_http_add_headers(params: dict[str, Any], metrics: PrometheusMetrics):
     headersb = HTTPStaticHeadersBuilder(params["settings"], "key", metrics)
     headers = headersb.build()
     assert headers.headers == params["headers"]
@@ -196,7 +196,7 @@ def test_http_add_headers(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_zipkin_middleware(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_zipkin_middleware(params: dict[str, Any], metrics: PrometheusMetrics):
     zkb = ZipkinBuilder(params["settings"], "key", metrics)
     zkm = zkb.build()
     assert isinstance(zkm, SyncZipkinMiddleware)

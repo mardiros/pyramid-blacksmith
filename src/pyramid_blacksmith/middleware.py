@@ -1,5 +1,5 @@
 import abc
-from typing import Any, Dict
+from typing import Any
 
 from blacksmith import (
     PrometheusMetrics,
@@ -42,7 +42,7 @@ class PrometheusMetricsBuilder(AbstractMiddlewareBuilder):
 class CircuitBreakerBuilder(AbstractMiddlewareBuilder):
     def build(self) -> SyncCircuitBreakerMiddleware:
         settings = list_to_dict(self.settings, self.prefix)
-        kwargs: Dict[str, Any] = {}
+        kwargs: dict[str, Any] = {}
         for key in ("threshold", "ttl"):
             if key in settings:
                 kwargs[key] = int(settings[key])
