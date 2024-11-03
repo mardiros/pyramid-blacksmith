@@ -52,6 +52,13 @@ dev = [
     "redis >=5.0.4,<6",
     "types-redis >=4.6.0,<6",
 ]
+doc = [
+    "esbonio>=0.16.5",
+    "sphinx>=7.0.0",
+    "sphinx-autodoc-typehints>=1.12.0,<2",
+    "furo>=2024.8.6",
+]
+
 
 [tool.pytest.ini_options]
 norecursedirs = "docs"

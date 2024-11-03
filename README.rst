@@ -1,12 +1,12 @@
 pyramid-blacksmith
 ==================
 
-.. image:: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/gh-pages.yml/badge.svg
+.. image:: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/publish-doc.yml/badge.svg
    :target: https://mardiros.github.io/pyramid-blacksmith/
    :alt: Documentation
 
-.. image:: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/main.yml/badge.svg
-   :target: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/main.yml
+.. image:: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/tests.yml/badge.svg
+   :target: https://github.com/mardiros/pyramid-blacksmith/actions/workflows/tests.yml
    :alt: Continuous Integration
 
 .. image:: https://codecov.io/gh/mardiros/pyramid-blacksmith/branch/main/graph/badge.svg?token=9IRABRO2LN
@@ -47,4 +47,3 @@ Go ahead and `get familiar with the documentation`_.
 .. _`Blacksmith`: https://mardiros.github.io/blacksmith/index.html
 .. _`Blacksmith Factory`: https://mardiros.github.io/blacksmith/user/instanciating_clients.html
 .. _`get familiar with the documentation`: https://mardiros.github.io/blacksmith/index.html
-

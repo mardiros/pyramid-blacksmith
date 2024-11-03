@@ -2,7 +2,7 @@ package := 'pyramid_blacksmith'
 default_test_suite := 'tests/unittests'
 
 install:
-    uv sync --group dev
+    uv sync --group dev --group doc
 
 doc:
     cd docs && uv run make html
