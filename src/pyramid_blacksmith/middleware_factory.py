@@ -1,4 +1,5 @@
 """Middleware"""
+
 import abc
 from typing import Dict
 

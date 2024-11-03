@@ -2,7 +2,6 @@ import sys
 from pathlib import Path
 from typing import Any, Dict
 
-from blacksmith.sd._sync.adapters.nomad import SyncNomadDiscovery
 import pytest
 from blacksmith import HTTPTimeout, PrometheusMetrics
 from blacksmith.domain.error import default_error_parser
@@ -14,6 +13,7 @@ from blacksmith.middleware._sync.circuit_breaker import SyncCircuitBreakerMiddle
 from blacksmith.middleware._sync.prometheus import SyncPrometheusMiddleware
 from blacksmith.middleware._sync.zipkin import SyncZipkinMiddleware
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
+from blacksmith.sd._sync.adapters.nomad import SyncNomadDiscovery
 from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
 from blacksmith.service._sync.adapters.httpx import SyncHttpxTransport
