@@ -999,7 +999,7 @@ requires-dist = [
     { name = "pyramid", specifier = ">1.10,<3" },
     { name = "sphinx", marker = "extra == 'docs'", specifier = ">=7.0.0" },
     { name = "sphinx-autodoc-typehints", marker = "extra == 'docs'", specifier = ">=1.12.0,<2" },
-    { name = "zk", specifier = ">=0.9.3,<0.10" },
+    { name = "zk", specifier = ">=0.9.4,<0.10" },
 ]
 
 [package.metadata.dependency-groups]
