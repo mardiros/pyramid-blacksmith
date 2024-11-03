@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from blacksmith import AbstractTraceContext
 from zipkin import api  # type: ignore
@@ -14,7 +14,7 @@ class TraceContext(AbstractTraceContext):
     """
 
     @classmethod
-    def make_headers(cls) -> Dict[str, str]:
+    def make_headers(cls) -> dict[str, str]:
         """Build headers for the sub requests."""
         trace = api.get_current_trace()
         if trace:

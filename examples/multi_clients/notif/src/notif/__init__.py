@@ -3,8 +3,9 @@ import smtplib
 from textwrap import dedent
 
 from blacksmith import SyncConsulDiscovery
-from notif.resources.user import User
 from pyramid.config import Configurator
+
+from notif.resources.user import User
 
 smtp_sd = SyncConsulDiscovery()
 

@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 
 from blacksmith import HTTPError
 from blacksmith.domain.error import AbstractErrorParser
@@ -84,7 +84,7 @@ class DummyCachePolicy(AbstractCachePolicy):
         return ""
 
     def get_response_cache_key(
-        self, client_name: str, path: str, req: HTTPRequest, vary: List[str]
+        self, client_name: str, path: str, req: HTTPRequest, vary: list[str]
     ):
         return ""
 

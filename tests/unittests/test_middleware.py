@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, cast
+from typing import Any, cast
 
 import pytest
 from blacksmith import SyncPrometheusMiddleware
@@ -8,7 +8,8 @@ from blacksmith.domain.model.middleware.http_cache import CacheControlPolicy
 from blacksmith.domain.model.middleware.prometheus import PrometheusMetrics
 from blacksmith.middleware._sync.zipkin import SyncZipkinMiddleware
 from purgatory import SyncInMemoryUnitOfWork
-from pyramid.config import ConfigurationError  # type: ignore
+from pyramid.config import ConfigurationError
+from redis import Redis  # type: ignore
 
 from pyramid_blacksmith.middleware import (
     CircuitBreakerBuilder,
@@ -66,14 +67,14 @@ def test_prometheus_metrics_builder(
         },
     ],
 )
-def test_circuit_breaker(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_circuit_breaker(params: dict[str, Any], metrics: PrometheusMetrics):
     builder = CircuitBreakerBuilder(params["settings"], "key", metrics)
     circuit = builder.build()
     assert circuit.circuit_breaker.default_threshold == params["expected_threshold"]
     assert circuit.circuit_breaker.default_ttl == params["expected_ttl"]
     assert len(circuit.circuit_breaker.listeners) == 1  # type: ignore
     assert isinstance(
-        list(circuit.circuit_breaker.listeners.keys())[0],  # type: ignore
+        next(iter(circuit.circuit_breaker.listeners.keys())),  # type: ignore
         PrometheusHook,
     )
     assert isinstance(circuit.circuit_breaker.uow, params["expected_uow"])
@@ -130,10 +131,13 @@ def test_circuit_breaker(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_http_caching_builder(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_http_caching_builder(params: dict[str, Any], metrics: PrometheusMetrics):
     cachingb = HTTPCacheBuilder(params["settings"], "key", metrics)
     caching = cachingb.build()
-    assert caching._cache.connection_pool.connection_kwargs == params["expected_redis"]
+    assert (
+        cast(Redis, caching._cache).connection_pool.connection_kwargs
+        == params["expected_redis"]
+    )
     assert isinstance(caching._policy, params["expected_policy"])
     assert caching._serializer is params["expected_serializer"]
     assert (
@@ -156,7 +160,7 @@ def test_http_caching_builder(params: Dict[str, Any], metrics: PrometheusMetrics
         },
     ],
 )
-def test_http_caching_builder_error(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_http_caching_builder_error(params: dict[str, Any], metrics: PrometheusMetrics):
     cachingb = HTTPCacheBuilder(params["settings"], "key", metrics)
     with pytest.raises(ConfigurationError) as ctx:
         cachingb.build()
@@ -177,7 +181,7 @@ def test_http_caching_builder_error(params: Dict[str, Any], metrics: PrometheusM
         },
     ],
 )
-def test_http_add_headers(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_http_add_headers(params: dict[str, Any], metrics: PrometheusMetrics):
     headersb = HTTPStaticHeadersBuilder(params["settings"], "key", metrics)
     headers = headersb.build()
     assert headers.headers == params["headers"]
@@ -192,7 +196,7 @@ def test_http_add_headers(params: Dict[str, Any], metrics: PrometheusMetrics):
         },
     ],
 )
-def test_zipkin_middleware(params: Dict[str, Any], metrics: PrometheusMetrics):
+def test_zipkin_middleware(params: dict[str, Any], metrics: PrometheusMetrics):
     zkb = ZipkinBuilder(params["settings"], "key", metrics)
-    zkb = zkb.build()
-    assert isinstance(zkb, SyncZipkinMiddleware)
+    zkm = zkb.build()
+    assert isinstance(zkm, SyncZipkinMiddleware)

@@ -5,10 +5,11 @@ from textwrap import dedent
 
 from blacksmith import HTTPError, ResponseBox
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
-from notif.resources.user import User
 from prometheus_client import CONTENT_TYPE_LATEST, REGISTRY, generate_latest
 from pyramid.response import Response
 from pyramid.view import view_config
+
+from notif.resources.user import User
 
 smtp_sd = SyncConsulDiscovery()
 

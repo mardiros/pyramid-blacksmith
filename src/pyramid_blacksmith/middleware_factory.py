@@ -1,6 +1,6 @@
 """Middleware"""
+
 import abc
-from typing import Dict
 
 from blacksmith import SyncHTTPAddHeadersMiddleware, SyncHTTPMiddleware
 from pyramid.request import Request  # type: ignore
@@ -21,11 +21,11 @@ class ForwardHeaderFactoryBuilder(AbstractMiddlewareFactoryBuilder):
     :param kwargs: headers
     """
 
-    def __init__(self, **kwargs: Dict[str, bool]):
+    def __init__(self, **kwargs: dict[str, bool]):
         self.headers = list(kwargs.keys())
 
     def __call__(self, request: Request) -> SyncHTTPAddHeadersMiddleware:
-        headers: Dict[str, str] = {}
+        headers: dict[str, str] = {}
         for hdr in self.headers:
             val = request.headers.get(hdr)
             if val:

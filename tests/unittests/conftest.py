@@ -1,4 +1,5 @@
-from typing import Any, Dict, Generator
+from collections.abc import Generator
+from typing import Any
 
 import pytest
 from blacksmith import PrometheusMetrics
@@ -13,7 +14,7 @@ from pyramid_blacksmith import includeme
 
 
 @pytest.fixture
-def config(params: Dict[str, Any]):
+def config(params: dict[str, Any]):
     config = testing.setUp(settings=params.get("settings", {}))
     config.include(includeme)
     yield config
@@ -39,7 +40,7 @@ def registry() -> Generator[CollectorRegistry, None, None]:
 
 @pytest.fixture
 def metrics(
-    registry: CollectorRegistry, params: Dict[str, Any]
+    registry: CollectorRegistry, params: dict[str, Any]
 ) -> Generator[PrometheusMetrics, None, None]:
     yield PrometheusMetrics(
         buckets=params.get("metrics", {}).get("buckets"),

@@ -35,11 +35,13 @@ def list_to_dict(
         try:
             key, val = param.split(maxsplit=1)
             dict_[key] = val
-        except ValueError:
+        except ValueError as exc:
             if with_flag:
                 dict_[param] = True
             else:
-                raise ConfigurationError(f"Invalid value {param} in {setting}[{idx}]")
+                raise ConfigurationError(
+                    f"Invalid value {param} in {setting}[{idx}]"
+                ) from exc
     return dict_
 
 
