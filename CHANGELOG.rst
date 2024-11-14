@@ -4,6 +4,10 @@
   forward the request.locale_name to the Accept-Language
   header made by blacksmith. See AcceptLanguageFactoryBuilder.
 
+4.0.2 - Released on 2024-11-14
+------------------------------
+* Authorize older zipkin and prometheus library.
+
 4.0.1 - Released on 2024-11-03
 ------------------------------
 * Binding for blacksmith 4.
