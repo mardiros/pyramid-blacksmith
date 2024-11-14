@@ -21,8 +21,8 @@ version = "4.0.1"
 dependencies = [
     "blacksmith >=4.0.0,<5",
     "pyramid >1.10,<3",
-    "prometheus-client >= 0.19.0,<1",
-    "zk >=0.9.4, <0.10",
+    "prometheus-client >= 0.17,<1",
+    "zk >=0.8, <0.10",
 ]
 
 [project.optional-dependencies]
