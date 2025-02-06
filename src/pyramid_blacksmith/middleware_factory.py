@@ -1,4 +1,11 @@
-"""Middleware"""
+"""
+Middleware factories.
+
+Create a dedicated blacksmith middleware per request to get the request
+context purpose in the middleware.
+
+This is usefull to proxify some data from parent request to sub request.
+"""
 
 import abc
 
@@ -8,6 +15,9 @@ from pyramid.request import Request
 
 class AbstractMiddlewareFactoryBuilder(abc.ABC):
     """Build the factory"""
+
+    @abc.abstractmethod
+    def __init__(self, **kwargs: dict[str, bool]): ...
 
     @abc.abstractmethod
     def __call__(self, request: Request) -> SyncHTTPMiddleware:
@@ -31,3 +41,14 @@ class ForwardHeaderFactoryBuilder(AbstractMiddlewareFactoryBuilder):
             if val:
                 headers[hdr] = val
         return SyncHTTPAddHeadersMiddleware(headers)
+
+
+class AcceptLanguageFactoryBuilder(AbstractMiddlewareFactoryBuilder):
+    """
+    Forward the pyramid request locale_name to sub call in a Accept-Language header.
+    """
+
+    def __init__(self, **kwargs: dict[str, bool]): ...
+
+    def __call__(self, request: Request) -> SyncHTTPAddHeadersMiddleware:
+        return SyncHTTPAddHeadersMiddleware({"Accept-Language": request.locale_name})

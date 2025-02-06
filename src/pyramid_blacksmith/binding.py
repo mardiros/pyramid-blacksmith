@@ -299,7 +299,6 @@ def blacksmith_binding_factory(
 ) -> Callable[[Request], PyramidBlacksmith]:
     settings: Settings = config.registry.settings  # type: ignore
     clients_key = aslist(settings.get("blacksmith.clients", ["client"]))
-
     metrics = BlacksmithPrometheusMetricsBuilder(settings).build()
 
     clients_dict = {
