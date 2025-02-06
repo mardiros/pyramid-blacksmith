@@ -227,6 +227,9 @@ class BlacksmithMiddlewareFactoryBuilder(SettingsBuilder):
             "forward_header": (
                 "pyramid_blacksmith.middleware_factory:ForwardHeaderFactoryBuilder"
             ),
+            "accept_language": (
+                "pyramid_blacksmith.middleware_factory:AcceptLanguageFactoryBuilder"
+            ),
         }
         value = aslist(
             self.settings.get(f"{self.prefix}.middleware_factories", []), flatten=False
