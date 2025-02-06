@@ -49,3 +49,4 @@ publish:
     git commit -am "Release $(uv run scripts/get_version.py)"
     git tag "v$(uv run scripts/get_version.py)"
     git push origin "v$(uv run scripts/get_version.py)"
+    git push origin main
