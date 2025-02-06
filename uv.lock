@@ -960,7 +960,7 @@ wheels = [
 
 [[package]]
 name = "pyramid-blacksmith"
-version = "4.0.1"
+version = "4.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "blacksmith" },
@@ -976,7 +976,7 @@ docs = [
     { name = "sphinx-autodoc-typehints" },
 ]
 
-[package.dependency-groups]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest" },
@@ -1002,7 +1002,7 @@ requires-dist = [
     { name = "zk", specifier = ">=0.8,<0.10" },
 ]
 
-[package.metadata.dependency-groups]
+[package.metadata.requires-dev]
 dev = [
     { name = "mypy", specifier = ">=1.4.1,<2" },
     { name = "pytest", specifier = ">=8.3.3,<9" },

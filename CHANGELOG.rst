@@ -1,3 +1,9 @@
+4.1.0 - Released on 2025-02-06
+------------------------------
+* Add a middleware factory "accept_language" that
+  forward the request.locale_name to the Accept-Language
+  header made by blacksmith. See AcceptLanguageFactoryBuilder.
+
 4.0.1 - Released on 2024-11-03
 ------------------------------
 * Binding for blacksmith 4.
