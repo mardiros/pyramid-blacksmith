@@ -227,6 +227,9 @@ class BlacksmithMiddlewareFactoryBuilder(SettingsBuilder):
             "forward_header": (
                 "pyramid_blacksmith.middleware_factory:ForwardHeaderFactoryBuilder"
             ),
+            "accept_language": (
+                "pyramid_blacksmith.middleware_factory:AcceptLanguageFactoryBuilder"
+            ),
         }
         value = aslist(
             self.settings.get(f"{self.prefix}.middleware_factories", []), flatten=False
@@ -299,7 +302,6 @@ def blacksmith_binding_factory(
 ) -> Callable[[Request], PyramidBlacksmith]:
     settings: Settings = config.registry.settings  # type: ignore
     clients_key = aslist(settings.get("blacksmith.clients", ["client"]))
-
     metrics = BlacksmithPrometheusMetricsBuilder(settings).build()
 
     clients_dict = {

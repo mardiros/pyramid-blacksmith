@@ -26,7 +26,9 @@ from pyramid_blacksmith.binding import (
     BlacksmithPrometheusMetricsBuilder,
     PyramidBlacksmith,
 )
-from pyramid_blacksmith.middleware_factory import ForwardHeaderFactoryBuilder
+from pyramid_blacksmith.middleware_factory import (
+    ForwardHeaderFactoryBuilder,
+)
 from tests.unittests.fixtures import (
     DummyCollectionParser,
     DummyErrorParser,
@@ -91,6 +93,26 @@ def test_includeme(config: dict[str, Any], registry: CollectorRegistry):
                 ],
             },
         },
+        pytest.param(
+            {
+                "settings": {
+                    "blacksmith.client.service_discovery": "router",
+                    "blacksmith.client.middleware_factories": ["accept_language"],
+                    "blacksmith.scan": "tests.unittests.resources",
+                },
+                "expected": {
+                    "sd": SyncRouterDiscovery,
+                    "timeout": HTTPTimeout(30, 15),
+                    "proxies": None,
+                    "verify": True,
+                    "transport": SyncHttpxTransport,
+                    "collection_parser": CollectionParser,
+                    "middlewares": [],
+                    "middleware_factories": [SyncHTTPAddHeadersMiddleware],
+                },
+            },
+            id="accept_language",
+        ),
         {
             "settings": {
                 "blacksmith.client.service_discovery": "router",
