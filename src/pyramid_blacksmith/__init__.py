@@ -7,8 +7,8 @@ from .middleware_factory import AbstractMiddlewareFactoryBuilder
 __version__ = metadata.version("pyramid_blacksmith")
 
 __all__ = [
+    "includeme",
+    "PyramidBlacksmith",
     "AbstractMiddlewareBuilder",
     "AbstractMiddlewareFactoryBuilder",
-    "PyramidBlacksmith",
-    "includeme",
 ]
