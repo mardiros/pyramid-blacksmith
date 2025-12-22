@@ -192,7 +192,6 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
             "circuitbreaker": "pyramid_blacksmith.middleware:CircuitBreakerBuilder",
             "http_cache": "pyramid_blacksmith.middleware:HTTPCacheBuilder",
             "static_headers": "pyramid_blacksmith.middleware:HTTPStaticHeadersBuilder",
-            "zipkin": "pyramid_blacksmith.middleware:ZipkinBuilder",
         }
         for middleware in value:
             try:

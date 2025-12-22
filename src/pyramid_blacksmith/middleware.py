@@ -9,12 +9,10 @@ from blacksmith import (
     SyncHTTPMiddleware,
     SyncPrometheusMiddleware,
 )
-from blacksmith.middleware._sync.zipkin import SyncZipkinMiddleware
 from pyramid.exceptions import ConfigurationError
 
 from pyramid_blacksmith.typing import Settings
 
-from .adapters.zipkin import TraceContext
 from .utils import list_to_dict, resolve_entrypoint
 
 
