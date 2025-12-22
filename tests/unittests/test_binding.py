@@ -9,6 +9,7 @@ from blacksmith.middleware._sync.auth import SyncHTTPBearerMiddleware
 from blacksmith.middleware._sync.base import SyncHTTPAddHeadersMiddleware
 from blacksmith.middleware._sync.circuit_breaker import SyncCircuitBreakerMiddleware
 from blacksmith.middleware._sync.prometheus import SyncPrometheusMiddleware
+from blacksmith.middleware._sync.zipkin import SyncZipkinMiddleware
 from blacksmith.sd._sync.adapters.consul import SyncConsulDiscovery
 from blacksmith.sd._sync.adapters.nomad import SyncNomadDiscovery
 from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
@@ -688,6 +689,14 @@ def test_metrics_builder(params: dict[str, Any], registry: CollectorRegistry):
                 """
             },
             "expected": [SyncHTTPAddHeadersMiddleware],
+        },
+        {
+            "settings": {
+                "blacksmith.client.middlewares": """
+                    zipkin
+                """
+            },
+            "expected": [SyncZipkinMiddleware],
         },
         {
             "settings": {
