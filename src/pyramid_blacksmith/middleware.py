@@ -84,8 +84,3 @@ class HTTPStaticHeadersBuilder(AbstractMiddlewareBuilder):
         settings = list_to_dict(self.settings, self.prefix)
         headers = {key.rstrip(":"): val for key, val in settings.items()}
         return SyncHTTPAddHeadersMiddleware(headers)
-
-
-class ZipkinBuilder(AbstractMiddlewareBuilder):
-    def build(self) -> SyncZipkinMiddleware:
-        return SyncZipkinMiddleware(TraceContext)  # type: ignore
