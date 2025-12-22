@@ -78,7 +78,7 @@ disallow_untyped_defs = true
 module = "blacksmith.*"
 
 [[tool.mypy.overrides]]
-module = ["prometheus_client", "pyramid.*", "venusian", "zipkin.*"]
+module = ["prometheus_client", "pyramid.*", "venusian"]
 ignore_missing_imports = true
 
 [tool.ruff]
