@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any
 
 from blacksmith import AbstractTraceContext
 from zipkin import api
@@ -40,7 +40,7 @@ class TraceContext(AbstractTraceContext):
         return self
 
     def annotate(
-        self, value: Optional[str], ts: Optional[float] = None
+        self, value: str | None, ts: float | None = None
     ) -> "AbstractTraceContext":
         """Annotate the span"""
         if self.trace is not None:
