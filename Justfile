@@ -4,6 +4,12 @@ default_test_suite := 'tests/unittests'
 install:
     uv sync --group dev --group doc
 
+update:
+    uv sync --group dev --group doc
+
+upgrade:
+    uv sync --group dev --group doc --upgrade
+
 doc:
     cd docs && uv run make html
     xdg-open docs/build/html/index.html
