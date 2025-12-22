@@ -1,4 +1,4 @@
-5.0.0 - Released on 2025-12-22
+5.0.1 - Released on 2025-12-22
 ------------------------------
 * Release compatible version of blacksmith 5.
 
