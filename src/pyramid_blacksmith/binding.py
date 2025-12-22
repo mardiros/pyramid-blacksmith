@@ -1,5 +1,5 @@
-from collections.abc import Iterator
-from typing import Any, Callable, ClassVar, Optional, cast
+from collections.abc import Callable, Iterator
+from typing import Any, ClassVar, cast
 
 import blacksmith
 from blacksmith import (
@@ -49,7 +49,7 @@ class BlacksmithPrometheusMetricsBuilder:
     This simplify tests, and it is not supposed to be a use case.
     """
 
-    _instance: ClassVar[Optional[PrometheusMetrics]] = None
+    _instance: ClassVar[PrometheusMetrics | None] = None
 
     def __init__(self, settings: Settings):
         self.settings = settings
@@ -142,7 +142,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
                 kwargs[key[1]] = int(self.settings[key[0]])
         return HTTPTimeout(**kwargs)
 
-    def get_proxies(self) -> Optional[Proxies]:
+    def get_proxies(self) -> Proxies | None:
         key = f"{self.prefix}.proxies"
         if key in self.settings:
             return cast(Proxies, list_to_dict(self.settings, key)) or None
@@ -151,7 +151,7 @@ class BlacksmithClientSettingsBuilder(SettingsBuilder):
     def get_verify_certificate(self) -> bool:
         return asbool(self.settings.get(f"{self.prefix}.verify_certificate", True))
 
-    def build_transport(self) -> Optional[SyncAbstractTransport]:
+    def build_transport(self) -> SyncAbstractTransport | None:
         value = self.settings.get(f"{self.prefix}.transport")
         if not value:
             return None
