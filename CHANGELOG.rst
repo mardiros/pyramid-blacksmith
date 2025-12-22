@@ -1,3 +1,13 @@
+5.1.0 - Released on 2025-12-22
+------------------------------
+* Drop zipkin support.
+  The relying library zk is unmaintained, removing the middleware.
+  This is a breaking change that has not been embeded with the 5.0.1
+  released on the same date, breaking the semver.
+  I prefer to have a compatible 5 version that still embed zipkin
+  if the migration is complicated. this is pragmatic and acceptable
+  for a 0 stars on github project.
+
 5.0.1 - Released on 2025-12-22
 ------------------------------
 * Release compatible version of blacksmith 5.

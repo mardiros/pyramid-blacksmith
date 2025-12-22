@@ -16,7 +16,7 @@ license = { text = "MIT License" }
 name = "pyramid-blacksmith"
 readme = "README.rst"
 requires-python = ">=3.10"
-version = "5.0.1"
+version = "5.1.0"
 
 dependencies = [
     "blacksmith >=5.0.0,<6",
