@@ -16,6 +16,7 @@ from blacksmith.sd._sync.adapters.router import SyncRouterDiscovery
 from blacksmith.sd._sync.adapters.static import SyncStaticDiscovery
 from blacksmith.service._sync.adapters.httpx import SyncHttpxTransport
 from blacksmith.service._sync.client import SyncClientFactory
+from httpx import HTTPTransport
 from prometheus_client import CollectorRegistry
 from pyramid.exceptions import ConfigurationError
 from pyramid.interfaces import IRequestExtensions
@@ -119,7 +120,7 @@ def test_includeme(config: dict[str, Any], registry: CollectorRegistry):
                 "blacksmith.client.router_sd_config": "",
                 "blacksmith.client.read_timeout": "5",
                 "blacksmith.client.connect_timeout": "2",
-                "blacksmith.client.proxies": ["http://  http//p/"],
+                "blacksmith.client.proxies": ["http://  http://p/"],
                 "blacksmith.client.verify_certificate": False,
                 "blacksmith.client.collection_parser": DummyCollectionParser,
                 "blacksmith.scan": "tests.unittests.resources",
@@ -127,7 +128,7 @@ def test_includeme(config: dict[str, Any], registry: CollectorRegistry):
             "expected": {
                 "sd": SyncRouterDiscovery,
                 "timeout": HTTPTimeout(5, 2),
-                "proxies": {"http://": "http//p/"},
+                "proxies": {"http://": HTTPTransport(proxy="http://p/")},
                 "verify": False,
                 "transport": SyncHttpxTransport,
                 "collection_parser": DummyCollectionParser,
@@ -167,10 +168,15 @@ def test_req_attr(
         dummy_request.blacksmith.clients["client"].timeout
         == params["expected"]["timeout"]
     )
-    assert (
-        dummy_request.blacksmith.clients["client"].transport.proxies
-        == params["expected"]["proxies"]
-    )
+    if params["expected"]["proxies"]:
+        assert (
+            params["expected"]["proxies"]["http://"]._pool._proxy_url
+            == dummy_request.blacksmith.clients["client"]  # type: ignore
+            .transport.proxies["http://"]
+            ._pool._proxy_url  # type: ignore
+        )
+    else:
+        assert dummy_request.blacksmith.clients["client"].transport.proxies is None
     assert (
         dummy_request.blacksmith.clients["client"].transport.verify_certificate
         == params["expected"]["verify"]
