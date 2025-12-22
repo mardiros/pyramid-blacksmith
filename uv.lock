@@ -1169,7 +1169,7 @@ wheels = [
 
 [[package]]
 name = "pyramid-blacksmith"
-version = "4.0.2"
+version = "5.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "blacksmith" },

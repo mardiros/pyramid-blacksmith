@@ -1,3 +1,7 @@
+5.0.0 - Released on 2025-12-22
+------------------------------
+* Release compatible version of blacksmith 5.
+
 4.1.0 - Released on 2025-02-06
 ------------------------------
 * Add a middleware factory "accept_language" that
