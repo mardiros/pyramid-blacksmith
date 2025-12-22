@@ -22,7 +22,6 @@ dependencies = [
     "blacksmith >=5.0.0,<6",
     "pyramid >1.10,<3",
     "prometheus-client >= 0.17,<1",
-    "zk >=0.8, <0.10",
 ]
 
 [project.optional-dependencies]
