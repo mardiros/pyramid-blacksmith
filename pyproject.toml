@@ -20,7 +20,7 @@ blacksmith = "^2.7.2"
 pyramid = ">1.10, <3"
 prometheus-client = ">0.14"
 python = "^3.7"
-zk = { version = "^0.8.5", extras = ["zipkin"] }
+zk = { version = "^0.8.5" }
 
 
 [tool.poetry.extras]
